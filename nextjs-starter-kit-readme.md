@@ -3,21 +3,27 @@
 Ein production-ready Starter Kit für moderne SaaS-Anwendungen. 100% self-hosted, keine Cloud-Abhängigkeiten, volle Kontrolle über deine Daten.
 
 ![Next.js](https://img.shields.io/badge/Next.js-15-black?style=flat-square&logo=next.js)
+![React](https://img.shields.io/badge/React-19-blue?style=flat-square&logo=react)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?style=flat-square&logo=typescript)
+![Tailwind](https://img.shields.io/badge/Tailwind-4.0-38B2AC?style=flat-square&logo=tailwind-css)
 ![Supabase](https://img.shields.io/badge/Supabase-Self--Hosted-green?style=flat-square&logo=supabase)
 ![Docker](https://img.shields.io/badge/Docker-Ready-blue?style=flat-square&logo=docker)
 
 ## ✨ Features
 
-### Core Features
-- **🔐 Authentifizierung** - Self-hosted Supabase Auth (Email/Password, Magic Links, OAuth)
-- **💳 Zahlungen** - Stripe Subscriptions fertig integriert
-- **📧 E-Mails** - Transactional Emails mit Resend + React Email
-- **🗄️ Datenbank** - PostgreSQL self-hosted via Supabase
-- **🎨 UI Components** - Tailwind CSS + shadcn/ui vorbereitet
-- **📊 Error Tracking** - Sentry Integration vorbereitet
-- **🔒 Security** - CSP Headers, CSRF Protection, Environment Validation
-- **📊 Logging** - Strukturiertes Logging mit Pino
+### ✅ **Implementiert (Production Ready)**
+- **🔐 Komplettes Auth System** - Server Actions, Middleware-Schutz, React 19 Forms
+- **🎨 Modernes UI System** - shadcn/ui Komponenten, Tailwind CSS 4, Dark Mode
+- **🛡️ Security First** - CSP Headers, CSRF Protection, Environment Validation
+- **📊 Strukturiertes Logging** - Pino Logger mit Error Handling
+- **🗄️ Datenbank Setup** - PostgreSQL mit RLS Policies, Auto-Migration
+- **🚀 Performance** - ES2022 Targets, optimierte Builds, SSR ready
+
+### 🔄 **In Entwicklung**
+- **💳 Stripe Integration** - Payment Processing und Webhooks
+- **📧 Email System** - React Email Templates mit Resend
+- **⚙️ Settings Pages** - User Profile Management
+- **📊 Dashboard** - User Analytics und Daten
 
 ### Self-Hosted Vorteile
 - **🏠 100% Datenhoheit** - Alle Daten bleiben auf deinem Server
@@ -96,7 +102,7 @@ pnpm run db:setup
 ### 5. Development starten
 
 ```bash
-# Development Server starten
+# Development Server starten (mit Turbopack)
 pnpm run dev
 
 # Besuche:
@@ -104,11 +110,18 @@ pnpm run dev
 # - Supabase Studio: http://localhost:55323
 ```
 
+### 6. Authentication testen
+
+1. **Registrieren**: Gehe zu http://localhost:3000/auth/register
+2. **Account erstellen**: Beliebige Email/Password verwenden
+3. **Auto-Bestätigung**: Development Mode bestätigt Emails automatisch
+4. **Dashboard**: Zugriff auf geschütztes http://localhost:3000/dashboard
+
 ## 📦 Verfügbare Scripts
 
 ```bash
 # Development
-pnpm run dev              # Development Server starten
+pnpm run dev              # Development Server starten (Turbopack)
 pnpm run build            # Production Build
 pnpm run start            # Production Server starten
 
@@ -118,9 +131,10 @@ pnpm run format           # Code formatieren mit Prettier
 pnpm run type-check       # TypeScript prüfen
 
 # Database
-pnpm run db:setup         # Datenbank initialisieren
+pnpm run db:setup         # Datenbank mit Schema initialisieren
 pnpm run db:migrate       # Migrations ausführen
 pnpm run db:seed          # Test-Daten laden
+pnpm run db:types         # TypeScript Types generieren (benötigt Supabase CLI)
 
 # Docker
 pnpm run docker:up        # Supabase Stack starten
@@ -190,33 +204,91 @@ DEFAULT_PROJECT_NAME: "Mein SaaS Projekt"
 ## 🏗️ Projekt-Struktur
 
 ```
-├── app/                    # Next.js App Router
-│   ├── (auth)/            # Auth-geschützte Routen
-│   │   └── dashboard/     
-│   ├── (marketing)/       # Öffentliche Seiten
-│   └── api/              
-├── components/           
-├── lib/                   # Core Utilities
-│   ├── supabase/         # DB Clients
-│   ├── stripe/           # Payment Logic
-│   └── email/            # Email Templates
-├── supabase/             # Supabase Config
-│   ├── migrations/       # SQL Migrations
-│   └── seed.sql          # Demo Daten
-├── docker-compose.yml    # Lokales Supabase
-└── Dockerfile           # Production Build
+├── app/                          # Next.js 15 App Router
+│   ├── auth/                    # Authentication Seiten
+│   │   ├── login/page.tsx       # Login Seite
+│   │   ├── register/page.tsx    # Registrierung
+│   │   ├── reset/page.tsx       # Passwort zurücksetzen
+│   │   └── confirm/page.tsx     # Email Bestätigung
+│   ├── dashboard/page.tsx       # Geschütztes Dashboard
+│   ├── api/
+│   │   ├── health/route.ts      # Health Check Endpoint
+│   │   └── webhooks/stripe/     # Stripe Webhook Handler
+│   ├── layout.tsx               # Root Layout mit Theme
+│   ├── page.tsx                 # Landing Page
+│   └── globals.css              # Globale Styles
+├── components/                   # React Komponenten
+│   ├── ui/                      # shadcn/ui Komponenten
+│   │   ├── button.tsx           # Button Komponente
+│   │   ├── card.tsx             # Card Komponente
+│   │   └── ...                  # Weitere UI Komponenten
+│   ├── auth/                    # Authentication Komponenten
+│   │   ├── auth-button.tsx      # Dynamischer Auth Button
+│   │   ├── sign-in-form.tsx     # Login Form
+│   │   ├── sign-up-form.tsx     # Registrierung Form
+│   │   └── submit-button.tsx    # Form Submit Button
+│   ├── layout/                  # Layout Komponenten
+│   │   ├── header.tsx           # Navigation Header
+│   │   └── footer.tsx           # Site Footer
+│   └── theme-provider.tsx       # Theme Context Provider
+├── lib/                         # Core Utilities
+│   ├── auth/
+│   │   └── actions.ts           # Server Actions für Auth
+│   ├── supabase/                # Database Clients
+│   │   ├── client.ts            # Client-side Client
+│   │   ├── server.ts            # Server-side Client
+│   │   └── middleware.ts        # Middleware Client
+│   ├── stripe/                  # Payment Logic
+│   │   ├── config.ts            # Stripe Konfiguration
+│   │   └── checkout.ts          # Checkout Logic
+│   ├── email/                   # Email System
+│   │   ├── client.ts            # Resend Client
+│   │   └── templates/           # React Email Templates
+│   ├── env.ts                   # Environment Validation
+│   ├── logger.ts                # Strukturiertes Logging
+│   └── utils.ts                 # Utility Functions
+├── hooks/                       # Custom React Hooks
+│   ├── use-user.ts              # User State Management
+│   └── use-profile.ts           # Profile Management
+├── middleware.ts                # Auth + Security Middleware
+├── instrumentation.ts           # Logging Setup
+├── docker-compose.yml           # Lokales Supabase
+└── Dockerfile                   # Production Build
 ```
 
 ## 🐳 Docker Services
 
-Das `docker-compose.yml` startet folgende Services:
+Das `docker-compose.yml` startet folgende Services mit Prefix:
 
-- **nextjs-starter-db** - PostgreSQL Database
-- **nextjs-starter-auth** - Supabase Auth Service
+- **nextjs-starter-db** - PostgreSQL Database (Port 55322)
+- **nextjs-starter-auth** - Supabase GoTrue Auth Service
 - **nextjs-starter-rest** - Supabase REST API
-- **nextjs-starter-storage** - File Storage
-- **nextjs-starter-studio** - Web Dashboard
-- **nextjs-starter-kong** - API Gateway
+- **nextjs-starter-storage** - File Storage Service
+- **nextjs-starter-studio** - Web-basiertes Database Dashboard (Port 55323)
+- **nextjs-starter-kong** - API Gateway (Port 55321)
+
+## 🛠️ Tech Stack Details
+
+### Frontend
+- **Next.js 15** - App Router mit Server Components
+- **React 19** - useActionState, useFormStatus, Server Actions
+- **TypeScript 5** - Vollständige Type Safety mit ES2022 Targets
+- **Tailwind CSS 4** - Zero-Config Styling mit modernen CSS Features
+- **shadcn/ui** - Zugängliche Komponenten mit Radix Primitives
+
+### Backend
+- **Supabase** - Self-hosted PostgreSQL mit integrierter Auth
+- **Row Level Security** - Database-Level Security Policies
+- **Server Actions** - Type-safe Server Mutations
+- **Middleware** - Route Protection und Security Headers
+- **Strukturiertes Logging** - Pino mit richtigem Error Handling
+
+### Development
+- **Turbopack** - Schnelle Development Builds
+- **ESLint** - Code Quality mit Next.js Rules
+- **Prettier** - Code Formatierung
+- **Husky** - Git Hooks für Quality Gates
+- **Docker Compose** - Lokale Development Umgebung
 
 ## 🚀 Production Deployment (Coolify)
 
@@ -264,35 +336,54 @@ curl -fsSL https://cdn.coollabs.io/coolify/install.sh | bash
 
 ## 🐛 Troubleshooting
 
-### Supabase startet nicht
+### Häufige Probleme & Lösungen
 
+#### 1. "Failed to retrieve tables" im Supabase Studio
+**Problem**: Studio kann nicht mit der Datenbank verbinden oder Tabellen fehlen  
+**Lösung**: 
 ```bash
-# Logs prüfen
-pnpm run docker:logs
+# Alle Services prüfen
+pnpm run docker:ps
 
-# Ports prüfen
-netstat -tulpn | grep 55321
-
-# Clean restart
-pnpm run docker:down
-pnpm run docker:up
+# Falls Tabellen fehlen, Migrations manuell ausführen:
+pnpm run db:setup
 ```
 
-### Port-Konflikte
-
-Falls Ports bereits belegt sind:
-1. Ports in `docker-compose.yml` ändern
-2. Ports in `.env.local` aktualisieren
-3. Container neu starten
-
-### Database Connection Issues
-
+#### 2. Port-Konflikte
+**Problem**: Ports 55321, 55322 oder 55323 bereits belegt  
+**Lösung**: 
 ```bash
-# Direct DB connection testen
-docker exec -it nextjs-starter-db psql -U postgres
+# Konfliktierende Services stoppen
+sudo lsof -ti:55321 | xargs kill -9
 
-# Connection URL für Debugging
-postgresql://postgres:your-password@localhost:55322/postgres
+# Oder Ports in docker-compose.yml und .env.local ändern
+```
+
+#### 3. Authentication "User not found" Errors
+**Problem**: Konsole zeigt "User not found" Fehler  
+**Hinweis**: Diese Fehler sind **normal** für nicht-eingeloggte Benutzer auf öffentlichen Seiten.
+
+#### 4. Database Connection Issues
+**Problem**: Services können nicht mit Datenbank verbinden  
+**Lösung**:
+```bash
+# Clean restart mit frischer Datenbank
+pnpm run docker:down
+docker volume rm nextjs-starter_nextjs-starter-db-data
+pnpm run docker:up
+sleep 30 && pnpm run db:setup
+```
+
+#### 5. Studio "Unhealthy" Status
+**Problem**: Studio Container zeigt als unhealthy  
+**Lösung**: 1-2 Minuten warten bis alle Services vollständig gestartet sind, dann Studio refreshen
+
+### Setup-Erfolg verifizieren
+```bash
+# Diese Befehle sollten alle funktionieren:
+curl http://localhost:55321/auth/v1/settings  # Zeigt Auth-Einstellungen
+curl http://localhost:55323                   # Zeigt Studio
+pnpm run docker:ps                           # Zeigt alle Container healthy
 ```
 
 ## 📝 Nächste Schritte

@@ -13,34 +13,50 @@ This starter kit represents the "sweet spot" between too minimal and over-engine
 
 ## 📦 Tech Stack
 
-### Core Dependencies
+### Core Dependencies (Current Implementation)
 ```json
 {
   "dependencies": {
-    "next": "15.x",
-    "react": "19.x",
-    "react-dom": "19.x",
-    "@supabase/supabase-js": "latest",
-    "@supabase/ssr": "latest",
-    "stripe": "latest",
-    "resend": "latest",
-    "react-email": "latest",
-    "@sentry/nextjs": "latest",
-    "pino": "latest",
-    "zod": "latest",
-    "@nosecone/next": "latest"
+    "next": "15.3.5",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "@supabase/supabase-js": "^2.50.4",
+    "@supabase/ssr": "^0.6.1",
+    "stripe": "^18.3.0",
+    "resend": "^4.6.0",
+    "react-email": "^4.1.0",
+    "@react-email/components": "^0.2.0",
+    "@sentry/nextjs": "^9.36.0",
+    "pino": "^9.7.0",
+    "zod": "^4.0.0",
+    "@radix-ui/react-avatar": "^1.1.10",
+    "@radix-ui/react-dropdown-menu": "^2.1.15",
+    "@radix-ui/react-label": "^2.1.7",
+    "@radix-ui/react-separator": "^1.1.7",
+    "@radix-ui/react-slot": "^1.2.3",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "lucide-react": "^0.525.0",
+    "next-themes": "^0.4.6",
+    "tailwind-merge": "^3.3.1"
   },
   "devDependencies": {
-    "typescript": "latest",
-    "tailwindcss": "latest",
-    "@types/node": "latest",
-    "@types/react": "latest",
-    "prettier": "latest",
-    "eslint": "latest",
-    "eslint-config-next": "latest",
-    "@commitlint/cli": "latest",
-    "@commitlint/config-conventional": "latest",
-    "husky": "latest"
+    "typescript": "^5",
+    "tailwindcss": "^4",
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "prettier": "^3.6.2",
+    "eslint": "^9",
+    "eslint-config-next": "15.3.5",
+    "@commitlint/cli": "^19.8.1",
+    "@commitlint/config-conventional": "^19.8.1",
+    "husky": "^9.1.7",
+    "dotenv": "^17.2.0",
+    "pino-pretty": "^13.0.0",
+    "tailwindcss-animate": "^1.0.7",
+    "tw-animate-css": "^1.3.5"
   }
 }
 ```
@@ -58,74 +74,95 @@ This starter kit represents the "sweet spot" between too minimal and over-engine
 ## 📁 Project Structure
 
 ```
-my-saas-starter/
+nextjs-starter/
 ├── app/                          # NextJS 15 App Router
-│   ├── (auth)/                   # Auth-required routes (grouped)
-│   │   ├── dashboard/
-│   │   │   ├── page.tsx         # Server Component by default
-│   │   │   ├── loading.tsx
-│   │   │   └── error.tsx
-│   │   └── settings/
-│   │       └── page.tsx
-│   ├── (marketing)/              # Public routes (grouped)
-│   │   ├── page.tsx             # Landing page
-│   │   ├── pricing/
-│   │   └── blog/
+│   ├── auth/                     # Authentication pages
+│   │   ├── confirm/
+│   │   │   └── page.tsx         # Email confirmation
+│   │   ├── login/
+│   │   │   └── page.tsx         # Login page
+│   │   ├── register/
+│   │   │   └── page.tsx         # Registration page
+│   │   └── reset/
+│   │       └── page.tsx         # Password reset
+│   ├── dashboard/
+│   │   └── page.tsx             # Protected dashboard
 │   ├── api/
-│   │   ├── webhooks/
-│   │   │   └── stripe/
-│   │   │       └── route.ts
-│   │   └── health/
-│   │       └── route.ts          # Health check for Coolify
-│   ├── layout.tsx                # Root layout
-│   ├── error.tsx                 # Global error boundary
-│   └── global-error.tsx          # Root error boundary
-├── components/
-│   ├── ui/                       # shadcn/ui components
+│   │   ├── health/
+│   │   │   └── route.ts         # Health check endpoint
+│   │   └── webhooks/
+│   │       └── stripe/
+│   │           └── route.ts     # Stripe webhook handler
+│   ├── layout.tsx               # Root layout with theme provider
+│   ├── page.tsx                 # Landing page
+│   ├── globals.css              # Global styles
+│   ├── error.tsx                # Global error boundary
+│   └── not-found.tsx            # 404 page
+├── components/                   # React components
+│   ├── ui/                      # shadcn/ui components
 │   │   ├── button.tsx
 │   │   ├── card.tsx
+│   │   ├── input.tsx
+│   │   ├── alert.tsx
+│   │   ├── avatar.tsx
+│   │   ├── dropdown-menu.tsx
+│   │   ├── label.tsx
+│   │   ├── separator.tsx
 │   │   └── ...
-│   ├── auth-button.tsx           # Feature components
-│   ├── pricing-table.tsx
-│   └── user-avatar.tsx
-├── lib/                          # Core utilities
+│   ├── auth/                    # Authentication components
+│   │   ├── auth-button.tsx      # Dynamic auth button
+│   │   ├── sign-in-form.tsx     # Login form with Server Actions
+│   │   ├── sign-up-form.tsx     # Registration form
+│   │   └── submit-button.tsx    # Form submit button with loading
+│   ├── layout/                  # Layout components
+│   │   ├── header.tsx           # Navigation header
+│   │   ├── footer.tsx           # Site footer
+│   │   └── container.tsx        # Container component
+│   └── theme-provider.tsx       # Theme context provider
+├── lib/                         # Core utilities
+│   ├── auth/
+│   │   └── actions.ts           # Server Actions for auth
 │   ├── supabase/
 │   │   ├── server.ts            # Server-side client
 │   │   ├── client.ts            # Client-side client
 │   │   └── middleware.ts        # Auth middleware
 │   ├── stripe/
-│   │   ├── config.ts
-│   │   ├── checkout.ts
-│   │   └── webhooks.ts
+│   │   ├── config.ts            # Stripe configuration
+│   │   └── checkout.ts          # Checkout logic
 │   ├── email/
 │   │   ├── client.ts            # Resend client
 │   │   └── templates/           # React Email templates
 │   │       ├── welcome.tsx
 │   │       └── invoice.tsx
+│   ├── env.ts                   # Environment validation
 │   ├── logger.ts                # Pino logger setup
-│   └── env.ts                   # Environment validation
-├── hooks/                        # Custom React hooks
-│   ├── use-user.ts
-│   └── use-subscription.ts
-├── types/
+│   └── utils.ts                 # Utility functions
+├── hooks/                       # Custom React hooks
+│   ├── use-user.ts              # User state management
+│   └── use-profile.ts           # Profile management
+├── types/                       # TypeScript types
 │   ├── database.ts              # Supabase generated types
 │   └── env.d.ts                 # Environment types
-├── middleware.ts                 # NextJS middleware
-├── instrumentation.ts            # Logging & monitoring setup
-├── .env.local                    # Local environment
-├── .env.example                  # Environment template
-├── next.config.js
-├── tailwind.config.ts
-├── tsconfig.json
-├── prettier.config.js
-├── .eslintrc.json
-├── .commitlintrc.json
-├── supabase/                     # Supabase configuration
-│   ├── migrations/               # SQL migrations
-│   ├── seed.sql                  # Development seed data
-│   └── config.toml               # Supabase config
-├── Dockerfile                    # Optimized for Coolify
-└── docker-compose.yml            # Local Supabase stack
+├── supabase/                    # Supabase configuration
+│   ├── migrations/              # SQL migrations
+│   │   └── 00001_initial_schema.sql
+│   ├── seed.sql                 # Development seed data
+│   └── kong.yml                 # Kong API gateway config
+├── scripts/                     # Utility scripts
+│   ├── setup-database.js        # Database setup script
+│   └── create-test-user.js      # Test user creation
+├── middleware.ts                # Auth + Security middleware
+├── instrumentation.ts           # Logging setup
+├── .env.local                   # Local environment
+├── .env.example                 # Environment template
+├── next.config.ts               # Next.js configuration
+├── tailwind.config.ts           # Tailwind configuration
+├── tsconfig.json                # TypeScript configuration
+├── prettier.config.js           # Prettier configuration
+├── .eslintrc.json               # ESLint configuration
+├── .commitlintrc.json           # Commit lint configuration
+├── docker-compose.yml           # Local Supabase stack
+└── Dockerfile                   # Production build
 ```
 
 ## 🔧 Implementation Details
@@ -237,47 +274,46 @@ export function createClient() {
 
 **File: `middleware.ts`**
 ```typescript
-import { createMiddleware } from '@nosecone/next';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-
-// Security headers middleware
-const securityMiddleware = createMiddleware({
-  contentSecurityPolicy: {
-    directives: {
-      defaultSrc: ["'self'"],
-      scriptSrc: ["'self'", "'unsafe-inline'", "https://js.stripe.com"],
-      styleSrc: ["'self'", "'unsafe-inline'"],
-      imgSrc: ["'self'", "blob:", "data:", "https:"],
-      connectSrc: ["'self'", "https://*.supabase.co", "https://api.stripe.com"],
-    },
-  },
-  strictTransportSecurity: {
-    maxAge: 31536000,
-    includeSubDomains: true,
-    preload: true,
-  },
-  xFrameOptions: 'DENY',
-  xContentTypeOptions: 'nosniff',
-  referrerPolicy: 'strict-origin-when-cross-origin',
-  permissionsPolicy: {
-    camera: [],
-    microphone: [],
-    geolocation: [],
-  },
-});
+import { updateSession } from '@/lib/supabase/middleware';
 
 export async function middleware(request: NextRequest) {
-  // Apply security headers
-  const response = await securityMiddleware(request);
+  // Update session and get user info
+  const { supabaseResponse, user } = await updateSession(request);
   
-  // Auth check for protected routes
-  if (request.nextUrl.pathname.startsWith('/(auth)')) {
-    // Verify auth status via Supabase
-    // Redirect if not authenticated
+  // Clone response to modify headers
+  const response = NextResponse.next({
+    request: {
+      headers: request.headers,
+    },
+  });
+  
+  // Apply security headers
+  response.headers.set('X-Frame-Options', 'DENY');
+  response.headers.set('X-Content-Type-Options', 'nosniff');
+  response.headers.set('X-XSS-Protection', '1; mode=block');
+  response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+  response.headers.set(
+    'Content-Security-Policy',
+    "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' blob: data: https:; connect-src 'self' http://localhost:55321 https://*.supabase.co;"
+  );
+  
+  // Protect authenticated routes
+  if (request.nextUrl.pathname.startsWith('/dashboard')) {
+    if (!user) {
+      return NextResponse.redirect(new URL('/auth/login', request.url));
+    }
   }
   
-  return response;
+  // Redirect authenticated users away from auth pages
+  if (request.nextUrl.pathname.startsWith('/auth/')) {
+    if (user) {
+      return NextResponse.redirect(new URL('/dashboard', request.url));
+    }
+  }
+  
+  return supabaseResponse;
 }
 
 export const config = {
@@ -566,12 +602,12 @@ CMD ["node", "server.js"]
 **File: `.env.example`**
 ```bash
 # Supabase (Local Docker defaults)
-NEXT_PUBLIC_SUPABASE_URL=http://localhost:54321
+NEXT_PUBLIC_SUPABASE_URL=http://localhost:55321
 NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0
 SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImV4cCI6MTk4MzgxMjk5Nn0.EGIM96RAZx35lJzdJsyH-qQwv8Hdp7fsn3W0YpN81IU
 
 # Database Direct Connection (Local Docker)
-DATABASE_URL=postgresql://postgres:your-super-secret-password@localhost:54322/postgres
+DATABASE_URL=postgresql://postgres:password@localhost:55322/postgres
 
 # Stripe
 NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_xxx
@@ -627,20 +663,22 @@ LOG_LEVEL=debug
 ```json
 {
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
     "format": "prettier --write .",
     "type-check": "tsc --noEmit",
     "db:setup": "node scripts/setup-database.js",
-    "db:types": "supabase gen types typescript --local > types/database.ts",
+    "db:types": "echo 'Supabase CLI not installed. Please install it to generate types.'",
     "db:migrate": "node scripts/migrate.js",
     "db:seed": "node scripts/seed.js",
-    "db:migration:new": "supabase migration new",
+    "db:migration:new": "echo 'Supabase CLI not installed. Please install it to create migrations.'",
     "docker:up": "docker-compose up -d",
     "docker:down": "docker-compose down",
-    "docker:logs": "docker-compose logs -f"
+    "docker:logs": "docker-compose logs -f",
+    "docker:ps": "docker-compose ps",
+    "prepare": "husky"
   }
 }
 ```
@@ -753,81 +791,81 @@ VALUES (
 version: '3.8'
 
 services:
-  supabase-db:
+  nextjs-starter-db:
     image: supabase/postgres:15.1.0.117
-    container_name: supabase-db
+    container_name: nextjs-starter-db
     ports:
-      - "54322:5432"
+      - "55322:5432"
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: your-super-secret-password
+      POSTGRES_PASSWORD: password
       POSTGRES_DB: postgres
     volumes:
-      - supabase-db-data:/var/lib/postgresql/data
+      - nextjs-starter-db-data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 5s
       timeout: 5s
       retries: 5
 
-  supabase-auth:
+  nextjs-starter-auth:
     image: supabase/gotrue:v2.99.0
-    container_name: supabase-auth
+    container_name: nextjs-starter-auth
     depends_on:
-      supabase-db:
+      nextjs-starter-db:
         condition: service_healthy
     environment:
       GOTRUE_API_HOST: 0.0.0.0
       GOTRUE_API_PORT: 9999
-      API_EXTERNAL_URL: http://localhost:54321
+      API_EXTERNAL_URL: http://localhost:55321
       GOTRUE_DB_DRIVER: postgres
-      GOTRUE_DB_DATABASE_URL: postgres://postgres:your-super-secret-password@supabase-db:5432/postgres?search_path=auth
+      GOTRUE_DB_DATABASE_URL: postgres://postgres:password@nextjs-starter-db:5432/postgres?search_path=auth
       GOTRUE_SITE_URL: http://localhost:3000
       GOTRUE_URI_ALLOW_LIST: http://localhost:3000
       GOTRUE_JWT_SECRET: your-super-secret-jwt-token-with-at-least-32-characters-long
       GOTRUE_JWT_EXP: 3600
       GOTRUE_JWT_DEFAULT_GROUP_NAME: authenticated
       GOTRUE_EXTERNAL_EMAIL_ENABLED: true
-      GOTRUE_MAILER_AUTOCONFIRM: true # Set to false in production
+      GOTRUE_MAILER_AUTOCONFIRM: true
       GOTRUE_SMTP_ADMIN_EMAIL: admin@example.com
       GOTRUE_SMTP_HOST: localhost
       GOTRUE_SMTP_PORT: 1025
-      GOTRUE_SMTP_SENDER_NAME: "My SaaS"
+      GOTRUE_SMTP_SENDER_NAME: "NextJS Starter"
 
-  supabase-rest:
+  nextjs-starter-rest:
     image: postgrest/postgrest:v11.2.0
-    container_name: supabase-rest
+    container_name: nextjs-starter-rest
     depends_on:
-      supabase-db:
+      nextjs-starter-db:
         condition: service_healthy
     environment:
-      PGRST_DB_URI: postgres://postgres:your-super-secret-password@supabase-db:5432/postgres
+      PGRST_DB_URI: postgres://postgres:password@nextjs-starter-db:5432/postgres
       PGRST_DB_SCHEMAS: public,storage,auth
       PGRST_DB_ANON_ROLE: anon
       PGRST_JWT_SECRET: your-super-secret-jwt-token-with-at-least-32-characters-long
 
-  supabase-storage:
+  nextjs-starter-storage:
     image: supabase/storage-api:v0.40.4
-    container_name: supabase-storage
+    container_name: nextjs-starter-storage
     depends_on:
-      supabase-db:
+      nextjs-starter-db:
         condition: service_healthy
     environment:
       ANON_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0
       SERVICE_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImV4cCI6MTk4MzgxMjk5Nn0.EGIM96RAZx35lJzdJsyH-qQwv8Hdp7fsn3W0YpN81IU
-      POSTGREST_URL: http://supabase-rest:3000
-      DATABASE_URL: postgres://postgres:your-super-secret-password@supabase-db:5432/postgres
+      POSTGREST_URL: http://nextjs-starter-rest:3000
+      DATABASE_URL: postgres://postgres:password@nextjs-starter-db:5432/postgres
       STORAGE_BACKEND: file
       FILE_SIZE_LIMIT: 52428800
       TENANT_ID: stub
       REGION: stub
       GLOBAL_S3_BUCKET: stub
 
-  supabase-kong:
+  nextjs-starter-kong:
     image: kong:2.8.1
-    container_name: supabase-kong
+    container_name: nextjs-starter-kong
     ports:
-      - "54321:8000"
+      - "55321:8000"
     environment:
       KONG_DATABASE: "off"
       KONG_DECLARATIVE_CONFIG: /var/lib/kong/kong.yml
@@ -836,23 +874,23 @@ services:
     volumes:
       - ./supabase/kong.yml:/var/lib/kong/kong.yml
 
-  supabase-studio:
+  nextjs-starter-studio:
     image: supabase/studio:latest
-    container_name: supabase-studio
+    container_name: nextjs-starter-studio
     ports:
-      - "54323:3000"
+      - "55323:3000"
     environment:
-      STUDIO_PG_META_URL: http://supabase-db:5432/postgres
-      POSTGRES_PASSWORD: your-super-secret-password
-      DEFAULT_ORGANIZATION_NAME: "My SaaS"
-      DEFAULT_PROJECT_NAME: "My SaaS Dev"
-      SUPABASE_URL: http://supabase-kong:8000
-      SUPABASE_PUBLIC_URL: http://localhost:54321
+      STUDIO_PG_META_URL: http://nextjs-starter-db:5432/postgres
+      POSTGRES_PASSWORD: password
+      DEFAULT_ORGANIZATION_NAME: "NextJS Starter"
+      DEFAULT_PROJECT_NAME: "NextJS Starter Dev"
+      SUPABASE_URL: http://nextjs-starter-kong:8000
+      SUPABASE_PUBLIC_URL: http://localhost:55321
       SUPABASE_ANON_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0
       SUPABASE_SERVICE_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImV4cCI6MTk4MzgxMjk5Nn0.EGIM96RAZx35lJzdJsyH-qQwv8Hdp7fsn3W0YpN81IU
 
 volumes:
-  supabase-db-data:
+  nextjs-starter-db-data:
 ```
 
 **File: `supabase/kong.yml`**

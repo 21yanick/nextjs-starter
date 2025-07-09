@@ -37,7 +37,7 @@ exec('docker ps', (error, stdout, stderr) => {
       console.log('✅ Database setup completed!');
       console.log('');
       console.log('🎉 Next steps:');
-      console.log('1. Open Supabase Studio: http://localhost:54323');
+      console.log('1. Open Supabase Studio: http://localhost:55323');
       console.log('2. Run: npm run dev');
       console.log('3. Visit: http://localhost:3000');
     }, 10000);

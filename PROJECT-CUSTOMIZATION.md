@@ -84,42 +84,54 @@ services:
     image: supabase/postgres:15.1.0.117
     container_name: mein-projekt-db   # ✏️ Ändere hier
     ports:
-      - "56322:5432"                  # ✏️ Ändere Port bei Konflikten
+      - "56322:5432"                  # ✏️ Ändere Port bei Konflikten (aktuell: 55322)
     environment:
-      POSTGRES_PASSWORD: dein-sicheres-passwort  # ✏️ Ändere hier
+      POSTGRES_PASSWORD: dein-sicheres-passwort  # ✏️ Ändere hier (aktuell: password)
       # ...
 
   mein-projekt-auth:                  # ✏️ Ändere hier
     # ...
     environment:
       GOTRUE_JWT_SECRET: dein-64-zeichen-jwt-secret  # ✏️ Ändere hier
-      GOTRUE_SMTP_SENDER_NAME: "Mein SaaS Name"      # ✏️ Ändere hier
+      GOTRUE_SMTP_SENDER_NAME: "Mein SaaS Name"      # ✏️ Ändere hier (aktuell: "NextJS Starter")
+      API_EXTERNAL_URL: http://localhost:56321       # ✏️ Ändere Port (aktuell: 55321)
       # ...
+
+  mein-projekt-kong:                  # ✏️ Ändere hier
+    # ...
+    ports:
+      - "56321:8000"                  # ✏️ Ändere Port bei Konflikten (aktuell: 55321)
 
   mein-projekt-studio:                # ✏️ Ändere hier
     # ...
+    ports:
+      - "56323:3000"                  # ✏️ Ändere Port bei Konflikten (aktuell: 55323)
     environment:
-      DEFAULT_ORGANIZATION_NAME: "Mein Unternehmen"  # ✏️ Ändere hier
-      DEFAULT_PROJECT_NAME: "Mein SaaS Projekt"      # ✏️ Ändere hier
+      DEFAULT_ORGANIZATION_NAME: "Mein Unternehmen"  # ✏️ Ändere hier (aktuell: "NextJS Starter")
+      DEFAULT_PROJECT_NAME: "Mein SaaS Projekt"      # ✏️ Ändere hier (aktuell: "NextJS Starter Dev")
+      SUPABASE_PUBLIC_URL: http://localhost:56321     # ✏️ Ändere Port (aktuell: 55321)
       # ...
 
 # Auch alle internen Service-URLs ändern:
 # nextjs-starter-db → mein-projekt-db
 # nextjs-starter-auth → mein-projekt-auth
-# etc.
+# nextjs-starter-rest → mein-projekt-rest
+# nextjs-starter-storage → mein-projekt-storage
+# nextjs-starter-kong → mein-projekt-kong
+# nextjs-starter-studio → mein-projekt-studio
 ```
 
 #### `supabase/kong.yml`
 ```yaml
 services:
   - name: auth-service
-    url: http://mein-projekt-auth:9999    # ✏️ Ändere hier
+    url: http://mein-projekt-auth:9999    # ✏️ Ändere hier (aktuell: nextjs-starter-auth)
     # ...
   - name: rest-service
-    url: http://mein-projekt-rest:3000    # ✏️ Ändere hier
+    url: http://mein-projekt-rest:3000    # ✏️ Ändere hier (aktuell: nextjs-starter-rest)
     # ...
   - name: storage-service
-    url: http://mein-projekt-storage:5000 # ✏️ Ändere hier
+    url: http://mein-projekt-storage:5000 # ✏️ Ändere hier (aktuell: nextjs-starter-storage)
     # ...
 ```
 
@@ -128,8 +140,8 @@ services:
 #### `.env.local`
 ```env
 # Supabase (bei Port-Änderungen)
-NEXT_PUBLIC_SUPABASE_URL=http://localhost:56321  # ✏️ Neue Port-Nummer
-DATABASE_URL=postgresql://postgres:dein-passwort@localhost:56322/postgres  # ✏️ Neue Port-Nummer + Passwort
+NEXT_PUBLIC_SUPABASE_URL=http://localhost:56321  # ✏️ Neue Port-Nummer (aktuell: 55321)
+DATABASE_URL=postgresql://postgres:dein-passwort@localhost:56322/postgres  # ✏️ Neue Port-Nummer + Passwort (aktuell: 55322, password)
 
 # Stripe (aus deinem Dashboard)
 NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_xxxx  # ✏️ Echte Keys
@@ -142,7 +154,7 @@ STRIPE_PRO_PRICE_ID=price_xxxx                   # ✏️ Echte Price-IDs
 RESEND_API_KEY=re_xxxx                           # ✏️ Echter Key
 
 # App (für deine Domain)
-NEXT_PUBLIC_APP_URL=https://mein-projekt.de     # ✏️ Deine Domain
+NEXT_PUBLIC_APP_URL=https://mein-projekt.de     # ✏️ Deine Domain (aktuell: http://localhost:3000)
 ```
 
 ### 4. Branding anpassen
@@ -160,6 +172,9 @@ export function WelcomeEmail({ userFirstname }: WelcomeEmailProps) {
           <Text style={text}>
             Danke für deine Anmeldung bei Mein SaaS Projekt.  {/* ✏️ Ändere hier */}
           </Text>
+          <Link href={`${process.env.NEXT_PUBLIC_APP_URL}/dashboard`} style={button}>
+            Zum Dashboard
+          </Link>
           {/* ... */}
         </Container>
       </Body>
@@ -263,7 +278,7 @@ pnpm run docker:ps
 curl http://localhost:3000/api/health
 
 # 6. Supabase Studio öffnen
-open http://localhost:56323  # Oder dein angepasster Port
+open http://localhost:55323  # Oder dein angepasster Port (aktuell: 55323)
 ```
 
 ### Häufige Probleme:

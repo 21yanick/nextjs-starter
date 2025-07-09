@@ -21,6 +21,13 @@ services:
         strip_path: true
         paths:
           - /storage/v1
+  - name: meta-service
+    url: http://nextjs-starter-meta:8080
+    routes:
+      - name: meta-route
+        strip_path: true
+        paths:
+          - /pg
 
 consumers:
   - username: anon

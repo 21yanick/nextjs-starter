@@ -1,11 +1,11 @@
 import { Suspense } from 'react';
 import { requireNoAuth } from '@/lib/supabase/server';
 import { Container } from '@/components/ui/container';
-import { SignInForm } from '@/components/auth/sign-in-form';
+import { ResetPasswordForm } from '@/components/auth/reset-password-form';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import Link from 'next/link';
 
-export default async function LoginPage() {
+export default async function ResetPage() {
   // Redirect if already authenticated
   await requireNoAuth();
 
@@ -15,32 +15,24 @@ export default async function LoginPage() {
         <div className="mx-auto max-w-md">
           <Card>
             <CardHeader className="text-center">
-              <CardTitle className="text-2xl">Welcome back</CardTitle>
+              <CardTitle className="text-2xl">Reset your password</CardTitle>
               <CardDescription>
-                Sign in to your account to continue
+                Enter your email address and we&apos;ll send you a link to reset your password
               </CardDescription>
             </CardHeader>
             <CardContent>
               <Suspense fallback={<div>Loading...</div>}>
-                <SignInForm />
+                <ResetPasswordForm />
               </Suspense>
               
               <div className="mt-6 text-center text-sm">
                 <p className="text-muted-foreground">
-                  Don&apos;t have an account?{' '}
+                  Remember your password?{' '}
                   <Link 
-                    href="/auth/register" 
+                    href="/auth/login" 
                     className="text-primary hover:underline"
                   >
-                    Sign up
-                  </Link>
-                </p>
-                <p className="mt-2 text-muted-foreground">
-                  <Link 
-                    href="/auth/reset" 
-                    className="text-primary hover:underline"
-                  >
-                    Forgot your password?
+                    Sign in
                   </Link>
                 </p>
               </div>

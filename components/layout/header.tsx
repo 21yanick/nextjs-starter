@@ -1,8 +1,8 @@
 import Link from "next/link"
 import { Container } from "@/components/ui/container"
-import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
+import { AuthButton } from "@/components/auth"
 
 export function Header() {
   return (
@@ -39,14 +39,7 @@ export function Header() {
               Docs
             </Link>
             <Separator orientation="vertical" className="h-6" />
-            <div className="flex items-center space-x-2">
-              <Button variant="ghost" size="sm" asChild>
-                <Link href="/auth/login">Sign in</Link>
-              </Button>
-              <Button size="sm" asChild>
-                <Link href="/auth/register">Get started</Link>
-              </Button>
-            </div>
+            <AuthButton />
           </nav>
         </div>
       </Container>

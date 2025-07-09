@@ -8,7 +8,7 @@ services:
       - "55322:5432"
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: your-super-secret-password
+      POSTGRES_PASSWORD: your-super-secret-and-long-postgres-password
       POSTGRES_DB: postgres
     volumes:
       - nextjs-starter-db-data:/var/lib/postgresql/data
@@ -29,7 +29,7 @@ services:
       GOTRUE_API_PORT: 9999
       API_EXTERNAL_URL: http://localhost:55321
       GOTRUE_DB_DRIVER: postgres
-      GOTRUE_DB_DATABASE_URL: postgres://postgres:your-super-secret-password@nextjs-starter-db:5432/postgres?search_path=auth
+      GOTRUE_DB_DATABASE_URL: postgres://postgres:your-super-secret-and-long-postgres-password@nextjs-starter-db:5432/postgres?search_path=auth
       GOTRUE_SITE_URL: http://localhost:3000
       GOTRUE_URI_ALLOW_LIST: http://localhost:3000
       GOTRUE_JWT_SECRET: your-super-secret-jwt-token-with-at-least-32-characters-long
@@ -49,7 +49,7 @@ services:
       nextjs-starter-db:
         condition: service_healthy
     environment:
-      PGRST_DB_URI: postgres://postgres:your-super-secret-password@nextjs-starter-db:5432/postgres
+      PGRST_DB_URI: postgres://postgres:your-super-secret-and-long-postgres-password@nextjs-starter-db:5432/postgres
       PGRST_DB_SCHEMAS: public,storage,auth
       PGRST_DB_ANON_ROLE: anon
       PGRST_JWT_SECRET: your-super-secret-jwt-token-with-at-least-32-characters-long
@@ -63,13 +63,32 @@ services:
     environment:
       ANON_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0
       SERVICE_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImV4cCI6MTk4MzgxMjk5Nn0.EGIM96RAZx35lJzdJsyH-qQwv8Hdp7fsn3W0YpN81IU
+      PGRST_JWT_SECRET: your-super-secret-jwt-token-with-at-least-32-characters-long
       POSTGREST_URL: http://nextjs-starter-rest:3000
-      DATABASE_URL: postgres://postgres:your-super-secret-password@nextjs-starter-db:5432/postgres
+      DATABASE_URL: postgres://postgres:your-super-secret-and-long-postgres-password@nextjs-starter-db:5432/postgres
       STORAGE_BACKEND: file
+      FILE_STORAGE_BACKEND_PATH: /var/lib/storage
       FILE_SIZE_LIMIT: 52428800
       TENANT_ID: stub
       REGION: stub
       GLOBAL_S3_BUCKET: stub
+    volumes:
+      - nextjs-starter-storage-data:/var/lib/storage
+
+  nextjs-starter-meta:
+    image: supabase/postgres-meta:v0.68.0
+    container_name: nextjs-starter-meta
+    depends_on:
+      nextjs-starter-db:
+        condition: service_healthy
+    restart: unless-stopped
+    environment:
+      PG_META_PORT: 8080
+      PG_META_DB_HOST: nextjs-starter-db
+      PG_META_DB_NAME: postgres
+      PG_META_DB_USER: postgres
+      PG_META_DB_PORT: 5432
+      PG_META_DB_PASSWORD: your-super-secret-and-long-postgres-password
 
   nextjs-starter-kong:
     image: kong:2.8.1
@@ -87,11 +106,14 @@ services:
   nextjs-starter-studio:
     image: supabase/studio:latest
     container_name: nextjs-starter-studio
+    depends_on:
+      nextjs-starter-kong:
+        condition: service_healthy
     ports:
       - "55323:3000"
     environment:
-      STUDIO_PG_META_URL: http://nextjs-starter-db:5432/postgres
-      POSTGRES_PASSWORD: your-super-secret-password
+      STUDIO_PG_META_URL: http://nextjs-starter-meta:8080
+      POSTGRES_PASSWORD: your-super-secret-and-long-postgres-password
       DEFAULT_ORGANIZATION_NAME: "NextJS SaaS Starter"
       DEFAULT_PROJECT_NAME: "NextJS SaaS Starter Dev"
       SUPABASE_URL: http://nextjs-starter-kong:8000
@@ -101,3 +123,4 @@ services:
 
 volumes:
   nextjs-starter-db-data:
+  nextjs-starter-storage-data:

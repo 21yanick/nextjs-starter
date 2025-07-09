@@ -78,9 +78,6 @@ export async function signInAction(
     }
 
     logger.info('User signed in successfully', { email });
-
-    // Get redirect URL from query params or default to dashboard
-    const redirectTo = formData.get('redirectTo') as string || '/dashboard';
     
   } catch (error) {
     logger.error('Sign in error', { error });
