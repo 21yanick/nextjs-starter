@@ -1,6 +1,6 @@
-# 🚀 NextJS SaaS Starter Kit - Self-Hosted Edition
+# 🌟 NextJS Universal Starter Kit - Self-Hosted Edition
 
-A production-ready starter kit for modern SaaS applications. 100% self-hosted, no cloud dependencies, full control over your data.
+A production-ready universal starter kit supporting **multiple business models**: SaaS, E-Commerce, Booking Systems, and more. 100% self-hosted, no cloud dependencies, full control over your data.
 
 ![Next.js](https://img.shields.io/badge/Next.js-15-black?style=flat-square&logo=next.js)
 ![React](https://img.shields.io/badge/React-19-blue?style=flat-square&logo=react)
@@ -8,22 +8,34 @@ A production-ready starter kit for modern SaaS applications. 100% self-hosted, n
 ![Tailwind](https://img.shields.io/badge/Tailwind-4.0-38B2AC?style=flat-square&logo=tailwind-css)
 ![Supabase](https://img.shields.io/badge/Supabase-Self--Hosted-green?style=flat-square&logo=supabase)
 ![Docker](https://img.shields.io/badge/Docker-Ready-blue?style=flat-square&logo=docker)
+![Stripe](https://img.shields.io/badge/Stripe-Integrated-purple?style=flat-square&logo=stripe)
+
+## 🎯 Universal Business Models
+
+**One Kit, Multiple Possibilities:**
+- **💼 SaaS Platform** - Subscription management, user dashboards, recurring billing
+- **🛍️ E-Commerce Shop** - Product catalog, shopping cart, order management  
+- **📅 Booking System** - Appointment scheduling, service management, payments
+- **🏢 Corporate Website** - Marketing pages, contact forms, lead generation
+- **🔄 Universal Mode** - Combine multiple models in one application
 
 ## ✨ Features
 
-### ✅ **Implemented (Production Ready)**
-- **🔐 Complete Authentication Flow** - Server Actions, middleware protection, React 19 forms
-- **🎨 Modern UI System** - shadcn/ui components, Tailwind CSS 4, dark mode
-- **🛡️ Security First** - CSP headers, CSRF protection, environment validation
+### ✅ **Production Ready (100% Complete)**
+- **🔐 Complete Authentication Flow** - JWT/PostgREST integration, middleware protection
+- **💳 Stripe Payment Integration** - Real checkout, webhooks, subscription management
+- **🔄 Business Model Switching** - Dynamic UI adaptation based on configuration
+- **🎨 Universal UI System** - Dynamic Header/Footer, dark/light mode, responsive design
+- **🛡️ Security First** - RLS policies, JWT validation, environment protection
 - **📊 Structured Logging** - Pino logger with proper error handling
-- **🗄️ Database Setup** - PostgreSQL with RLS policies, auto-migration
-- **🚀 Performance** - ES2022 targets, optimized builds, SSR ready
+- **🗄️ Production Database** - PostgreSQL with comprehensive migrations
+- **🚀 Performance Optimized** - Server Components, React 19, optimized builds
 
-### 🔄 **In Progress**
-- **💳 Stripe Integration** - Payment processing and webhooks
-- **📧 Email System** - React Email templates with Resend
-- **⚙️ Settings Pages** - User profile management
-- **📊 Dashboard** - User analytics and data
+### 🛍️ **E-Commerce Features**
+- **Product Catalog** - Image galleries, pricing, inventory
+- **Shopping Cart** - Add to cart, quantity management
+- **Order Processing** - Checkout flow, payment integration
+- **Responsive Design** - Mobile-first e-commerce experience
 
 ### Self-Hosted Benefits
 - **🏠 100% Data Sovereignty** - All data stays on your server
@@ -78,12 +90,55 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 # App Configuration
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 
+# Business Model Configuration
+BUSINESS_MODEL=saas                 # saas | shop | booking | universal
+PAYMENT_REGION=international        # international | swiss | german
+ENABLE_SUBSCRIPTIONS=true
+ENABLE_SHOP=false
+ENABLE_BOOKINGS=false
+
 # External Services (Optional)
 NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_...
 STRIPE_SECRET_KEY=sk_test_...
 STRIPE_WEBHOOK_SECRET=whsec_...
+STRIPE_STARTER_PRICE_ID=price_...
+STRIPE_PRO_PRICE_ID=price_...
 RESEND_API_KEY=re_...
 ```
+
+### 🔄 Business Model Switching
+
+Change your entire application by updating the environment:
+
+```bash
+# SaaS Platform
+BUSINESS_MODEL=saas
+ENABLE_SUBSCRIPTIONS=true
+ENABLE_SHOP=false
+
+# E-Commerce Shop  
+BUSINESS_MODEL=shop
+ENABLE_SUBSCRIPTIONS=false
+ENABLE_SHOP=true
+
+# Booking System
+BUSINESS_MODEL=booking
+ENABLE_SUBSCRIPTIONS=false
+ENABLE_BOOKINGS=true
+
+# Universal (All Features)
+BUSINESS_MODEL=universal
+ENABLE_SUBSCRIPTIONS=true
+ENABLE_SHOP=true
+ENABLE_BOOKINGS=true
+```
+
+**Changes Applied Automatically:**
+- Header/Footer navigation adapts
+- Landing page content switches
+- Features page shows relevant sections
+- Pricing page displays appropriate plans
+- Payment flows adjust to business model
 
 ### 4. Initialize Database
 

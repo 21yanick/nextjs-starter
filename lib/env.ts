@@ -20,6 +20,18 @@ const envSchema = z.object({
   // Database Direct Connection (for migrations)
   DATABASE_URL: z.string().optional(),
   
+  // Business Model Configuration
+  BUSINESS_MODEL: z.enum(['saas', 'shop', 'booking', 'universal']).default('universal'),
+  PAYMENT_REGION: z.enum(['international', 'swiss', 'german', 'universal']).default('universal'),
+  
+  // Feature Toggles
+  ENABLE_SUBSCRIPTIONS: z.string().default('true').transform(val => val === 'true'),
+  ENABLE_SHOP: z.string().default('true').transform(val => val === 'true'),
+  ENABLE_BOOKINGS: z.string().default('false').transform(val => val === 'true'),
+  
+  // Additional Stripe Configuration
+  STRIPE_ENTERPRISE_PRICE_ID: z.string().optional(),
+  
   // Logging
   LOG_LEVEL: z.enum(['debug', 'info', 'warn', 'error']).default('info'),
   
