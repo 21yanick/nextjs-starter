@@ -12,6 +12,8 @@
 
 # testing
 /coverage
+/archive*
+/archive
 
 # next.js
 /.next/
