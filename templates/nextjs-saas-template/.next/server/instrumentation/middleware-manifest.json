@@ -1,0 +1,12 @@
+{
+  "sorted_middleware": [],
+  "middleware": {},
+  "instrumentation": {
+    "files": [
+      "server/edge/chunks/templates_nextjs-saas-template_227cf667._.js",
+      "server/edge/chunks/templates_nextjs-saas-template_edge-wrapper_482300c6.js"
+    ],
+    "name": "instrumentation"
+  },
+  "functions": {}
+}
