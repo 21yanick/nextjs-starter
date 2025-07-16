@@ -1,13 +1,12 @@
-// Shop Template - Hard-coded Configuration (No ENV switching)
-// This replaces the universal business-config.ts with Shop-only logic
+// Shop Template - Swiss-only Configuration
+// This template is configured specifically for Swiss market operations
 
 export type BusinessModel = 'shop'; // Fixed - no other options
-export type PaymentRegion = 'international' | 'swiss' | 'german';
 
 export interface BusinessConfig {
   model: 'shop'; // Always Shop
-  region: PaymentRegion;
   currency: string;
+  locale: string;
   features: {
     subscriptions: false; // Always false - completely removed
     shop: true; // Always true
@@ -20,30 +19,19 @@ export interface BusinessConfig {
 }
 
 export function getBusinessConfig(): BusinessConfig {
-  // No ENV switching - hard-coded Shop configuration
-  const region = (process.env.PAYMENT_REGION as PaymentRegion) || 'international';
-  
-  const currency = region === 'swiss' ? 'CHF' : 
-                  region === 'german' ? 'EUR' : 'USD';
-  
-  const paymentMethods = {
-    international: ['card', 'link'],
-    swiss: ['card', 'twint'],
-    german: ['card', 'sepa_debit', 'sofort'],
-  };
-  
+  // Swiss-only configuration - no multi-region support
   return {
     model: 'shop',
-    region,
-    currency,
+    currency: 'CHF',
+    locale: 'de-CH',
     features: {
       subscriptions: false, // Completely removed - no subscription code exists
       shop: true,
       bookings: false, // Completely removed - no booking code exists
     },
     payment: {
-      methods: paymentMethods[region] || paymentMethods.international,
-      currency,
+      methods: ['card', 'twint'], // Swiss payment methods only
+      currency: 'CHF',
     },
   };
 }
@@ -79,82 +67,46 @@ export function getAvailableFeatures() {
   };
 }
 
-// Keep currency formatting (universal utility)
+// Swiss-specific currency formatting
 export function formatCurrency(amount: number, currency?: string): string {
-  const config = getBusinessConfig();
-  const useCurrency = currency || config.currency;
+  const useCurrency = currency || 'CHF';
   
-  return new Intl.NumberFormat(
-    config.region === 'swiss' ? 'de-CH' :
-    config.region === 'german' ? 'de-DE' : 'en-US',
-    {
-      style: 'currency',
-      currency: useCurrency,
-    }
-  ).format(amount / 100);
+  return new Intl.NumberFormat('de-CH', {
+    style: 'currency',
+    currency: useCurrency,
+  }).format(amount / 100); // Convert from Rappen
 }
 
 export function getLocalizedStrings() {
-  const config = getBusinessConfig();
-  
-  if (config.region === 'swiss' || config.region === 'german') {
-    return {
-      currency: config.currency,
-      locale: config.region === 'swiss' ? 'de-CH' : 'de-DE',
-      dateFormat: 'dd.MM.yyyy',
-      paymentMethods: {
-        card: 'Kreditkarte',
-        twint: 'TWINT',
-        sepa_debit: 'SEPA Lastschrift',
-        sofort: 'Sofort',
-      },
-      shopping: {
-        addToCart: config.region === 'swiss' ? 'In den Warenkorb' : 'In den Warenkorb',
-        checkout: config.region === 'swiss' ? 'Zur Kasse' : 'Zur Kasse',
-        cart: config.region === 'swiss' ? 'Warenkorb' : 'Warenkorb',
-      },
-    };
-  }
-  
   return {
-    currency: config.currency,
-    locale: 'en-US',
-    dateFormat: 'MM/dd/yyyy',
+    currency: 'CHF',
+    locale: 'de-CH',
+    dateFormat: 'dd.MM.yyyy',
     paymentMethods: {
-      card: 'Credit Card',
-      link: 'Link',
+      card: 'Kreditkarte',
+      twint: 'TWINT',
     },
     shopping: {
-      addToCart: 'Add to Cart',
-      checkout: 'Checkout',
-      cart: 'Shopping Cart',
+      addToCart: 'In den Warenkorb',
+      checkout: 'Zur Kasse',
+      cart: 'Warenkorb',
     },
   };
 }
 
-// Shop-specific configuration helpers
+// Swiss-specific shop configuration helpers
 export function getShippingConfig() {
-  const config = getBusinessConfig();
-  
   return {
-    freeShippingThreshold: config.region === 'swiss' ? 5000 : 5000, // 50 CHF/EUR/USD in cents
-    shippingCost: config.region === 'swiss' ? 990 : 990, // 9.90 CHF/EUR/USD in cents
-    allowedCountries: config.region === 'swiss' ? ['CH', 'LI'] :
-                     config.region === 'german' ? ['DE', 'AT', 'CH'] :
-                     ['US', 'CA', 'GB', 'EU'],
+    freeShippingThreshold: 5000, // 50 CHF in cents
+    shippingCost: 990, // 9.90 CHF in cents
+    allowedCountries: ['CH', 'LI'], // Switzerland and Liechtenstein
   };
 }
 
 export function getTaxConfig() {
-  const config = getBusinessConfig();
-  
   return {
-    includeTax: config.region === 'swiss' || config.region === 'german',
-    taxRate: config.region === 'swiss' ? 0.077 : // 7.7% VAT Switzerland
-             config.region === 'german' ? 0.19 : // 19% VAT Germany
-             0.0, // No tax for international (handled by Stripe Tax)
-    taxLabel: config.region === 'swiss' ? 'inkl. 7.7% MwSt.' :
-              config.region === 'german' ? 'inkl. 19% MwSt.' :
-              'Tax calculated at checkout',
+    includeTax: true,
+    taxRate: 0.077, // 7.7% VAT Switzerland
+    taxLabel: 'inkl. 7.7% MwSt.',
   };
 }

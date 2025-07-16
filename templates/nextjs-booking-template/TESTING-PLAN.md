@@ -137,34 +137,13 @@ ENABLE_BOOKINGS=true
 
 ### **Test Scenarios**:
 
-#### **3.1 Swiss Region**
+#### **3.1 Swiss Configuration** (Swiss-only template)
 ```env
-PAYMENT_REGION=swiss
-BUSINESS_MODEL=universal
+BUSINESS_MODEL=booking
 ```
 - [ ] **Currency**: CHF wird verwendet
-- [ ] **Payment Methods**: Card + TWINT verfügbar
+- [ ] **Payment Methods**: Card + TWINT verfügbar (immediate payments only)
 - [ ] **Stripe Checkout**: Swiss-spezifische Optionen
-- [ ] **Test Payment**: Successful checkout flow
-
-#### **3.2 German Region**
-```env
-PAYMENT_REGION=german
-BUSINESS_MODEL=universal
-```
-- [ ] **Currency**: EUR wird verwendet
-- [ ] **Payment Methods**: Card + SEPA + Sofort verfügbar
-- [ ] **Stripe Checkout**: German-spezifische Optionen
-- [ ] **Test Payment**: Successful checkout flow
-
-#### **3.3 International Region**
-```env
-PAYMENT_REGION=international
-BUSINESS_MODEL=universal
-```
-- [ ] **Currency**: USD wird verwendet
-- [ ] **Payment Methods**: Card + Link verfügbar
-- [ ] **Stripe Checkout**: International-Setup
 - [ ] **Test Payment**: Successful checkout flow
 
 #### **3.4 Payment Flows by Business Model**

@@ -10,11 +10,11 @@
     "lint": "next lint",
     "format": "prettier --write .",
     "type-check": "tsc --noEmit",
-    "db:setup": "node scripts/setup-database.js",
-    "db:migrate": "node scripts/migrate.js",
-    "db:seed": "node scripts/seed.js",
-    "docker:up": "docker-compose up -d",
-    "docker:down": "docker-compose down",
+    "db:setup": "echo '⚠️ Database setup runs from infrastructure/ directory. See CLIENT-README.md'",
+    "db:migrate": "echo '⚠️ Database migrations run from infrastructure/ directory'",
+    "db:seed": "echo '⚠️ Database seeding runs from infrastructure/ directory'",
+    "docker:up": "echo '⚠️ Infrastructure runs from infrastructure/ directory. Run: cd ../../nextjs-starter/infrastructure && docker compose up -d'",
+    "docker:down": "echo '⚠️ Infrastructure runs from infrastructure/ directory. Run: cd ../../nextjs-starter/infrastructure && docker compose down'",
     "prepare": "husky"
   },
   "dependencies": {

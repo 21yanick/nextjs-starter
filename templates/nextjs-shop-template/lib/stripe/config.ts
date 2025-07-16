@@ -9,13 +9,9 @@ export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 export type BusinessModel = 'saas' | 'shop' | 'booking' | 'universal';
 export type PaymentMode = 'subscription' | 'payment' | 'setup';
 
-// Universal Payment Methods Configuration
+// Swiss-only Payment Methods Configuration
 export const PAYMENT_METHODS = {
-  // Default payment methods by region/business model
-  international: ['card', 'link'],
   swiss: ['card', 'twint'],
-  german: ['card', 'sepa_debit', 'sofort'],
-  universal: ['card'], // Safe default
 } as const;
 
 // SaaS Subscription Configuration
@@ -25,16 +21,15 @@ export const SUBSCRIPTION_PRICES = {
   enterprise: process.env.STRIPE_ENTERPRISE_PRICE_ID,
 } as const;
 
-// Business Model Configuration
+// Business Model Configuration (Swiss-only)
 export function getBusinessConfig() {
-  const businessModel = (process.env.BUSINESS_MODEL as BusinessModel) || 'universal';
-  const region = process.env.PAYMENT_REGION || 'universal';
+  const businessModel = (process.env.BUSINESS_MODEL as BusinessModel) || 'shop';
   
   return {
     businessModel,
-    region,
-    paymentMethods: PAYMENT_METHODS[region as keyof typeof PAYMENT_METHODS] || PAYMENT_METHODS.universal,
-    currency: region === 'swiss' ? 'CHF' : region === 'german' ? 'EUR' : 'USD',
+    region: 'swiss',
+    paymentMethods: PAYMENT_METHODS.swiss,
+    currency: 'CHF',
     enableSubscriptions: process.env.ENABLE_SUBSCRIPTIONS === 'true',
     enableShop: process.env.ENABLE_SHOP === 'true',
     enableBookings: process.env.ENABLE_BOOKINGS === 'true',
@@ -45,15 +40,6 @@ export function getBusinessConfig() {
 export function getPaymentMethodsForCheckout(businessModel?: BusinessModel) {
   const config = getBusinessConfig();
   
-  // Business model specific payment method filtering
-  switch (businessModel || config.businessModel) {
-    case 'saas':
-      return config.paymentMethods; // All available methods
-    case 'shop':
-      return config.paymentMethods; // All available methods
-    case 'booking':
-      return config.paymentMethods.filter(method => method !== 'sepa_debit'); // Immediate payments only
-    default:
-      return config.paymentMethods;
-  }
+  // Swiss-only payment methods - all available for shop model
+  return config.paymentMethods;
 }

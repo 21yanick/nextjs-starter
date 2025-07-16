@@ -90,9 +90,8 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 # App Configuration
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 
-# Business Model Configuration
-BUSINESS_MODEL=saas                 # saas | shop | booking | universal
-PAYMENT_REGION=international        # international | swiss | german
+# Business Model Configuration (Swiss-only)
+BUSINESS_MODEL=saas                 # Swiss-only SaaS template
 ENABLE_SUBSCRIPTIONS=true
 ENABLE_SHOP=false
 ENABLE_BOOKINGS=false

@@ -6,9 +6,9 @@ console.log('🚀 Setting up database...');
 
 // Check if .env.local exists
 if (!fs.existsSync('.env.local')) {
-  console.log('📝 Creating .env.local from .env.example...');
-  fs.copyFileSync('.env.example', '.env.local');
-  console.log('✅ .env.local created. Please update it with your values.');
+  console.log('📝 Creating .env.local from .env...');
+  fs.copyFileSync('.env', '.env.local');
+  console.log('✅ .env.local created from .env.');
 }
 
 // Check if Docker is running
@@ -23,7 +23,7 @@ exec('docker ps', (error, stdout, stderr) => {
   
   // Start Supabase services
   console.log('🐳 Starting Supabase services...');
-  exec('docker-compose up -d', (error, stdout, stderr) => {
+  exec('docker compose up -d', (error, stdout, stderr) => {
     if (error) {
       console.error('❌ Failed to start Supabase services:', error);
       process.exit(1);
@@ -37,11 +37,11 @@ exec('docker ps', (error, stdout, stderr) => {
       console.log('📊 Running database migrations...');
       
       // Execute migration
-      exec('docker exec nextjs-core-db psql -U postgres -d postgres -f supabase/migrations/00001_clean_schema.sql', (error, stdout, stderr) => {
+      exec('docker exec supabase-db psql -U postgres -d postgres -f supabase/migrations/00001_clean_schema.sql', (error, stdout, stderr) => {
         if (error) {
           console.log('⚠️ Migration failed, trying manual table creation...');
           // Fallback: Create essential tables manually
-          exec('docker exec nextjs-core-db psql -U postgres -d postgres -c "CREATE EXTENSION IF NOT EXISTS \\"uuid-ossp\\"; CREATE TABLE IF NOT EXISTS public.profiles (id UUID PRIMARY KEY, email TEXT UNIQUE NOT NULL, full_name TEXT, avatar_url TEXT, stripe_customer_id TEXT UNIQUE, created_at TIMESTAMPTZ DEFAULT NOW(), updated_at TIMESTAMPTZ DEFAULT NOW()); ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;"', (error2) => {
+          exec('docker exec supabase-db psql -U postgres -d postgres -c "CREATE EXTENSION IF NOT EXISTS \\"uuid-ossp\\"; CREATE TABLE IF NOT EXISTS public.profiles (id UUID PRIMARY KEY, email TEXT UNIQUE NOT NULL, full_name TEXT, avatar_url TEXT, stripe_customer_id TEXT UNIQUE, created_at TIMESTAMPTZ DEFAULT NOW(), updated_at TIMESTAMPTZ DEFAULT NOW()); ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;"', (error2) => {
             if (error2) {
               console.log('❌ Failed to create tables:', error2.message);
             } else {

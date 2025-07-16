@@ -1,8 +1,8 @@
 #!/bin/bash
 
-# NextJS Starter Kit - Client Project Generator
-# Usage: ./create-project.sh <client-name> <business-model> [region]
-# Example: ./create-project.sh kunde-crm saas swiss
+# 🇨🇭 NextJS Swiss Starter Kit - Client Project Generator
+# Usage: ./create-project.sh <client-name> <business-model>
+# Example: ./create-project.sh kunde-crm saas
 
 set -e
 
@@ -32,50 +32,37 @@ print_error() {
 
 # Check arguments
 if [ $# -lt 2 ]; then
-    print_error "Usage: $0 <client-name> <business-model> [region]"
+    print_error "Usage: $0 <client-name> <business-model>"
     echo "Business models: saas, shop, booking"
-    echo "Regions: international (default), swiss, german"
     echo ""
     echo "Examples:"
     echo "  $0 kunde-crm saas"
-    echo "  $0 beauty-salon booking swiss"
-    echo "  $0 online-shop shop german"
+    echo "  $0 beauty-salon booking"
+    echo "  $0 online-shop shop"
     exit 1
 fi
 
 CLIENT_NAME=$1
 BUSINESS_MODEL=$2
-REGION=${3:-international}
 
 # Validate business model
-case $BUSINESS_MODEL in
-    saas|shop|booking)
-        ;;
-    *)
-        print_error "Invalid business model: $BUSINESS_MODEL"
-        echo "Valid options: saas, shop, booking"
-        exit 1
-        ;;
-esac
+if [[ ! "$BUSINESS_MODEL" =~ ^(saas|shop|booking)$ ]]; then
+    print_error "Invalid business model: $BUSINESS_MODEL"
+    echo "Valid options: saas, shop, booking"
+    exit 1
+fi
 
-# Validate region
-case $REGION in
-    international|swiss|german)
-        ;;
-    *)
-        print_error "Invalid region: $REGION"
-        echo "Valid options: international, swiss, german"
-        exit 1
-        ;;
-esac
+# Validate client name
+if [[ ! "$CLIENT_NAME" =~ ^[a-zA-Z0-9_-]+$ ]]; then
+    print_error "Invalid client name: $CLIENT_NAME"
+    echo "Client name must contain only letters, numbers, hyphens, and underscores"
+    exit 1
+fi
 
-TARGET_DIR="../clients/$CLIENT_NAME"
+# Directory paths
 TEMPLATE_DIR="templates/nextjs-${BUSINESS_MODEL}-template"
 CORE_DIR="templates/nextjs-core"
-
-print_status "🚀 Creating professional ${BUSINESS_MODEL} project for ${CLIENT_NAME}"
-print_status "📍 Region: ${REGION}"
-print_status "📂 Target: ${TARGET_DIR}"
+TARGET_DIR="../clients/${CLIENT_NAME}"
 
 # Check if template exists
 if [ ! -d "$TEMPLATE_DIR" ]; then
@@ -100,39 +87,46 @@ if [ -d "$TARGET_DIR" ]; then
     rm -rf "$TARGET_DIR"
 fi
 
-# Create client directory structure
-mkdir -p "../clients"
+# Create target directory
+mkdir -p "$TARGET_DIR"
+
+# Start generation
+print_status "🚀 Creating professional ${BUSINESS_MODEL} project for ${CLIENT_NAME}"
+print_status "📂 Target: ${TARGET_DIR}"
+
+# Copy core foundation
 print_status "📋 Copying core foundation..."
+cp -r "$CORE_DIR/." "$TARGET_DIR/"
 
-# Copy core files
-cp -r "$CORE_DIR" "$TARGET_DIR"
-
-print_status "🎯 Adding $BUSINESS_MODEL specific features..."
-
-# Copy and merge template-specific files
+# Copy business model specific template
+print_status "🎯 Adding ${BUSINESS_MODEL} specific features..."
 if [ -d "$TEMPLATE_DIR" ]; then
-    # Copy template files, overwriting core files where needed
-    cp -rf "$TEMPLATE_DIR"/* "$TARGET_DIR"/
+    cp -rf "$TEMPLATE_DIR/." "$TARGET_DIR/"
 fi
 
-# Update package.json with client name
-print_status "📦 Customizing package.json for $CLIENT_NAME..."
-sed -i "s/\"name\": \".*\"/\"name\": \"$CLIENT_NAME\"/" "$TARGET_DIR/package.json"
+# Customize package.json
+print_status "📦 Customizing package.json for ${CLIENT_NAME}..."
+if [ -f "$TARGET_DIR/package.json" ]; then
+    sed -i "s/\"name\": \".*\"/\"name\": \"${CLIENT_NAME}\"/" "$TARGET_DIR/package.json"
+fi
 
-# Copy working environment from main project and customize
-print_status "⚙️ Creating environment configuration..."
+# Create environment configuration
+print_status "⚙ Creating environment configuration..."
+if [ -f "$TARGET_DIR/.env.example" ]; then
+    cp "$TARGET_DIR/.env.example" "$TARGET_DIR/.env.local"
+fi
 
-# Copy complete working environment
-cp .env.local "$TARGET_DIR/.env.local"
-
-# Add client-specific header
-sed -i "1i# $CLIENT_NAME - $BUSINESS_MODEL Configuration" "$TARGET_DIR/.env.local"
+# Add header to .env.local
+sed -i "1i# ${CLIENT_NAME} - ${BUSINESS_MODEL} Configuration" "$TARGET_DIR/.env.local"
 sed -i "2i# Generated on $(date)" "$TARGET_DIR/.env.local"
 sed -i "3i#" "$TARGET_DIR/.env.local"
 
-# Update business model specific configuration
+# Fix DATABASE_URL to use Docker pooler port (55322) for client connections
+print_status "🔧 Fixing DATABASE_URL for Docker pooler connection..."
+sed -i "s/DATABASE_URL=postgresql:\/\/postgres:.*@localhost:[0-9]*\/postgres/DATABASE_URL=postgresql:\/\/postgres:your-super-secret-and-long-postgres-password@localhost:55322\/postgres/" "$TARGET_DIR/.env.local"
+
+# Update business model specific configuration (Swiss-only)
 sed -i "s/^BUSINESS_MODEL=.*/BUSINESS_MODEL=$BUSINESS_MODEL/" "$TARGET_DIR/.env.local"
-sed -i "s/^PAYMENT_REGION=.*/PAYMENT_REGION=$REGION/" "$TARGET_DIR/.env.local"
 
 # Set feature flags based on business model
 case $BUSINESS_MODEL in
@@ -155,187 +149,163 @@ esac
 
 # Create client documentation
 print_status "📝 Creating client documentation..."
-cat > "$TARGET_DIR/CLIENT-README.md" << EOF
-# $CLIENT_NAME - $BUSINESS_MODEL Platform
+cat > "$TARGET_DIR/README.md" << EOF
+# ${CLIENT_NAME} - Swiss ${BUSINESS_MODEL} Application
 
-Professional $BUSINESS_MODEL solution built with NextJS Starter Kit.
-
-## Business Model: $BUSINESS_MODEL
-**Region:** $REGION  
+**Business Model:** ${BUSINESS_MODEL}
 **Generated:** $(date)
 
-## Features Included
+## 🚀 Quick Start
+
+\`\`\`bash
+# Install dependencies
+npm install
+
+# Start development server
+npm run dev
+
+# Open http://localhost:3000
+\`\`\`
+
+## 🏗️ Project Structure
+
+This project is generated from the Swiss NextJS Starter Kit template.
+
+- **Business Model:** ${BUSINESS_MODEL}
+- **Currency:** CHF (Swiss Francs)
+- **Language:** German (de-CH)
+- **Payment Methods:** Kreditkarte, TWINT
+
+## 🔧 Configuration
+
+Environment variables are configured in \`.env.local\`:
+
+\`\`\`env
+BUSINESS_MODEL=${BUSINESS_MODEL}
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+\`\`\`
+
+## 📚 Documentation
+
+- **Main Documentation:** \`nextjs-starter/docs/\`
+- **Template Guide:** \`nextjs-starter/docs/templates/\`
+- **Setup Guide:** \`nextjs-starter/docs/setup/\`
+
+## 🛠️ Development
+
+\`\`\`bash
+# Development server
+npm run dev
+
+# Build for production
+npm run build
+
+# Start production server
+npm start
+\`\`\`
+
+## 🏢 Business Model Features
+
 EOF
 
+# Add business model specific documentation
 case $BUSINESS_MODEL in
     saas)
-        cat >> "$TARGET_DIR/CLIENT-README.md" << EOF
-- ✅ User authentication & management
-- ✅ Subscription billing (Stripe)
-- ✅ Dashboard & analytics
-- ✅ Email system
-- ✅ Security & compliance
-- ❌ E-commerce (not included)
-- ❌ Booking system (not included)
+        cat >> "$TARGET_DIR/README.md" << EOF
+### SaaS Features
+- ✅ Subscription Management
+- ✅ User Dashboards
+- ✅ Stripe Integration
+- ✅ Authentication System
+
+### Subscription Plans
+- Starter Plan: CHF 29/month
+- Pro Plan: CHF 99/month
+- Enterprise: Custom pricing
 EOF
         ;;
     shop)
-        cat >> "$TARGET_DIR/CLIENT-README.md" << EOF
-- ✅ User authentication & management
-- ✅ E-commerce & shopping cart
-- ✅ Product management
-- ✅ Payment processing
-- ✅ Order management
-- ❌ Subscriptions (not included)
-- ❌ Booking system (not included)
+        cat >> "$TARGET_DIR/README.md" << EOF
+### E-Commerce Features
+- ✅ Product Catalog
+- ✅ Shopping Cart
+- ✅ Order Management
+- ✅ Payment Processing
+
+### Swiss E-Commerce
+- Free shipping over CHF 50
+- 7.7% VAT included
+- Swiss & Liechtenstein delivery
 EOF
         ;;
     booking)
-        cat >> "$TARGET_DIR/CLIENT-README.md" << EOF
-- ✅ User authentication & management
-- ✅ Appointment booking system
-- ✅ Calendar integration
-- ✅ Service management
-- ✅ Payment & deposits
-- ❌ Subscriptions (not included)
-- ❌ E-commerce (not included)
+        cat >> "$TARGET_DIR/README.md" << EOF
+### Booking Features
+- ✅ Appointment Scheduling
+- ✅ Service Management
+- ✅ Calendar Integration
+- ✅ Payment Processing
+
+### Swiss Booking System
+- Business hours: 09:00 - 18:00
+- 24h advance booking required
+- 50% deposit required
+- Europe/Zurich timezone
 EOF
         ;;
 esac
 
-cat >> "$TARGET_DIR/CLIENT-README.md" << EOF
+cat >> "$TARGET_DIR/README.md" << EOF
 
-## Zero Ballast Code
-This project contains ONLY the code needed for your $BUSINESS_MODEL business.
-No unused payment methods, no irrelevant features, no bloat.
+## 🇨🇭 Swiss Optimization
 
-## Quick Start
+This application is optimized for the Swiss market:
+
+- **Currency:** CHF (Rappen-based calculations)
+- **Language:** German (de-CH)
+- **Payments:** Kreditkarte, TWINT
+- **Tax:** 7.7% MwSt. included
+- **Locale:** Swiss number/date formatting
+
+## 🔗 Infrastructure
+
+Make sure the infrastructure is running:
+
 \`\`\`bash
-cd $CLIENT_NAME
-npm install
-npm run docker:up
-npm run db:setup
-npm run dev
+# Start infrastructure
+cd ../nextjs-starter/infrastructure
+docker-compose up -d
+
+# Check status
+docker-compose ps
 \`\`\`
 
-## Production Deployment
-1. Update .env.local with production values
-2. Configure Stripe webhooks
-3. Set up email service (Resend)
-4. Deploy with your preferred hosting
+## 📞 Support
 
-## Support
-- Framework: NextJS 15 + React 19
-- Database: Supabase (self-hosted)
-- Payments: Stripe
-- Email: Resend
-- Styling: Tailwind CSS 4
+For issues or questions, refer to the main documentation in \`nextjs-starter/docs/\`.
 
-Built with professional standards and best practices.
+---
+
+Generated with 🇨🇭 Swiss NextJS Starter Kit
 EOF
 
-# Create .gitignore if it doesn't exist
-if [ ! -f "$TARGET_DIR/.gitignore" ]; then
-    print_status "📁 Creating .gitignore..."
-    cat > "$TARGET_DIR/.gitignore" << EOF
-# Dependencies
-node_modules/
-.pnp
-.pnp.js
-
-# Production builds
-.next/
-out/
-dist/
-
-# Environment files
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-
-# Logs
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
-
-# Runtime data
-pids
-*.pid
-*.seed
-*.pid.lock
-
-# Coverage directory used by tools like istanbul
-coverage/
-*.lcov
-
-# Dependency directories
-node_modules/
-
-# Optional npm cache directory
-.npm
-
-# Optional eslint cache
-.eslintcache
-
-# Microbundle cache
-.rpt2_cache/
-.rts2_cache_cjs/
-.rts2_cache_es/
-.rts2_cache_umd/
-
-# Optional REPL history
-.node_repl_history
-
-# Output of 'npm pack'
-*.tgz
-
-# Yarn Integrity file
-.yarn-integrity
-
-# Stores VSCode versions used for testing VSCode extensions
-.vscode-test
-
-# yarn v2
-.yarn/cache
-.yarn/unplugged
-.yarn/build-state.yml
-.yarn/install-state.gz
-.pnp.*
-
-# Database
-*.db
-*.sqlite
-
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-
-# OS
-.DS_Store
-Thumbs.db
-
-# Docker
-volumes/
-EOF
+# Remove any .git directory from template
+if [ -d "$TARGET_DIR/.git" ]; then
+    rm -rf "$TARGET_DIR/.git"
 fi
 
+# Success message
 print_success "🎉 Client project created successfully!"
-print_success "📂 Location: $TARGET_DIR"
-print_success "🎯 Business Model: $BUSINESS_MODEL"
-print_success "📍 Region: $REGION"
+print_success "📂 Location: ${TARGET_DIR}"
+print_success "🎯 Business Model: ${BUSINESS_MODEL}"
 
 echo ""
 print_status "Next steps:"
-echo "1. cd $TARGET_DIR"
-echo "2. npm install"
-echo "3. npm run docker:up"
+echo "1. Start infrastructure: cd infrastructure && docker compose up -d"
+echo "2. Setup client project: cd ${TARGET_DIR}"
+echo "3. npm install"
 echo "4. npm run db:setup"
 echo "5. npm run dev"
 echo ""
-print_status "Professional $BUSINESS_MODEL solution ready for $CLIENT_NAME! 🚀"
+print_status "Professional ${BUSINESS_MODEL} solution ready for ${CLIENT_NAME}! 🚀"
+print_status "📁 Infrastructure runs separately from nextjs-starter/infrastructure/"

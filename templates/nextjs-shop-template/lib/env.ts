@@ -20,9 +20,8 @@ const envSchema = z.object({
   // Database Direct Connection (for migrations)
   DATABASE_URL: z.string().optional(),
   
-  // Business Model Configuration
+  // Business Model Configuration (Swiss-only)
   BUSINESS_MODEL: z.enum(['saas', 'shop', 'booking', 'universal']).default('universal'),
-  PAYMENT_REGION: z.enum(['international', 'swiss', 'german', 'universal']).default('universal'),
   
   // Feature Toggles
   ENABLE_SUBSCRIPTIONS: z.string().default('true').transform(val => val === 'true'),
