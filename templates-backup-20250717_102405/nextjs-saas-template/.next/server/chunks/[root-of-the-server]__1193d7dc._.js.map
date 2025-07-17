@@ -1,0 +1,6 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 15, "column": 0}, "map": {"version":3,"sources":["file:///home/satoshi/projects/private/nextjs-starter/templates/nextjs-saas-template/lib/logger.ts"],"sourcesContent":["import pino from 'pino';\n\nconst isDevelopment = process.env.NODE_ENV === 'development';\n\n// Base logger configuration\nexport const logger = pino({\n  level: process.env.LOG_LEVEL || 'info',\n  ...(isDevelopment\n    ? {\n        transport: {\n          target: 'pino-pretty',\n          options: {\n            colorize: true,\n            ignore: 'pid,hostname',\n            translateTime: 'HH:MM:ss',\n          },\n        },\n      }\n    : {\n        // Production: JSON format\n        formatters: {\n          level: (label) => ({ level: label.toUpperCase() }),\n        },\n        timestamp: pino.stdTimeFunctions.isoTime,\n      }),\n});\n\n// Create child loggers for different modules\nexport const getLogger = (module: string) => logger.child({ module });"],"names":[],"mappings":";;;;AAAA;;AAEA,MAAM,gBAAgB,oDAAyB;AAGxC,MAAM,SAAS,CAAA,GAAA,iGAAA,CAAA,UAAI,AAAD,EAAE;IACzB,OAAO,QAAQ,GAAG,CAAC,SAAS,IAAI;IAChC,GAAI,uCACA;QACE,WAAW;YACT,QAAQ;YACR,SAAS;gBACP,UAAU;gBACV,QAAQ;gBACR,eAAe;YACjB;QACF;IACF,wCAOC;AACP;AAGO,MAAM,YAAY,CAAC,SAAmB,OAAO,KAAK,CAAC;QAAE;IAAO","debugId":null}}]
+}

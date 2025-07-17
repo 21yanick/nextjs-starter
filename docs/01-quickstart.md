@@ -16,6 +16,7 @@ docker --version && node --version && git --version
 
 ## 🏗️ Setup (3 Steps)
 
+### Kundenprojekt-Entwicklung
 ### 1. Infrastructure (2 min)
 ```bash
 git clone [repo-url] nextjs-starter
@@ -32,7 +33,32 @@ cd ..
 ### 3. Run (2 min)
 ```bash
 cd clients/mein-projekt
-npm install && npm run db:setup && npm run dev
+pnpm install && pnpm run db:setup && pnpm run dev
+```
+
+**✅ Ready:** [App](http://localhost:3000) | [Database](http://localhost:55323)
+
+---
+
+## 🛠️ Template-Entwicklung (Starter-Kit-Verbesserung)
+
+### 1. Infrastructure (2 min)
+```bash
+git clone [repo-url] nextjs-starter
+cd nextjs-starter/infrastructure
+docker compose up -d
+```
+
+### 2. Development-Template (1 min)
+```bash
+cd ..
+scripts/template-manager.sh create-dev
+```
+
+### 3. Template-Development (2 min)
+```bash
+cd templates/nextjs-saas-dev/
+pnpm install && pnpm run db:setup && pnpm run dev
 ```
 
 **✅ Ready:** [App](http://localhost:3000) | [Database](http://localhost:55323)
@@ -80,14 +106,18 @@ Password: password123
 
 **Verstehe das System:**
 - [System Architecture](02-system.md) - Wie alles funktioniert
-- [Template Details](03-templates.md) - Business Model Features
+- [Template Details](03-templates.md) - Business Model Features + Template-Development
 
 **Start Development:**
-- [Development Workflow](05-development.md) - Daily commands
+- [Development Workflow](05-development.md) - Daily commands + Template-Development
 - [Service Integrations](04-integrations.md) - Stripe, Email setup
 
 **Customize for Client:**
 - [Customization Guide](06-customization.md) - Branding & Production
+
+**Template-Development:**
+- [Template Management](03-templates.md#template-management) - Scripts und Workflow
+- [Development Templates](05-development.md#template-development) - Dual-Purpose-Architektur
 
 ---
 

@@ -6,16 +6,30 @@
 
 ## 🚀 Quick Start
 
+### Template-Entwicklung (Starter-Kit-Verbesserung)
 ```bash
 # 1. Infrastructure starten
 cd infrastructure && docker compose up -d
 
-# 2. Template wählen und setup
-cd ../templates/nextjs-saas-template
-npm install && npm run db:setup
+# 2. Development-Template wählen und setup
+cd ../templates/nextjs-saas-dev
+pnpm install && pnpm run db:setup
 
 # 3. Development starten  
-npm run dev
+pnpm run dev
+```
+
+### Kundenprojekt-Entwicklung
+```bash
+# 1. Infrastructure starten
+cd infrastructure && docker compose up -d
+
+# 2. Kundenprojekt erstellen
+./create-project.sh mein-kunde saas
+cd clients/mein-kunde
+
+# 3. Development starten
+pnpm install && pnpm run db:setup && pnpm run dev
 ```
 
 **URLs**: [App](http://localhost:3000) | [Database](http://localhost:55323)
@@ -42,6 +56,58 @@ npm run format && npm run lint && npm run type-check
 npm run db:setup     # Complete setup (first time)
 npm run db:migrate   # Schema changes
 npm run db:seed      # Test data
+```
+
+---
+
+## 🛠️ Template-Development
+
+### Template-Manager Commands
+```bash
+# Status anzeigen
+scripts/template-manager.sh status
+
+# Development-Templates erstellen
+scripts/template-manager.sh create-dev
+
+# Nach Entwicklung: Sync zurück zu Production
+scripts/template-manager.sh sync saas
+
+# Alle Templates validieren
+scripts/template-manager.sh validate
+```
+
+### Template-Development-Workflow
+```bash
+# 1. Development-Template erstellen (einmalig)
+scripts/template-manager.sh create-dev
+
+# 2. Daily Development
+cd templates/nextjs-saas-dev/
+pnpm install && pnpm run dev
+# → Entwickle Core-Changes (UI, Auth) + SaaS-Changes (Stripe, API)
+
+# 3. Intelligente Synchronisation
+scripts/template-manager.sh sync saas
+# → Core-Changes automatisch zu nextjs-core/
+# → SaaS-Changes automatisch zu nextjs-saas-template/
+# → Alle Dev-Templates werden regeneriert
+```
+
+### Template-Intelligence
+- **Core-Detection**: `components/ui/`, `lib/supabase/`, `components/auth/` → Shared
+- **SaaS-Detection**: `lib/stripe/`, `app/api/checkout/`, SaaS-components → Business-specific
+- **Auto-Sync**: Script erkennt automatisch Ziel-Template
+- **Complete-Regeneration**: Alle Templates bleiben konsistent
+
+### Template-Struktur
+```bash
+templates/
+├── nextjs-core/              # Shared (UI, Auth, Layout)
+├── nextjs-saas-template/     # SaaS-specific (Stripe, API)
+├── nextjs-saas-dev/          # Development (Core + SaaS merged)
+├── nextjs-shop-dev/          # Development (Core + Shop merged)
+└── nextjs-booking-dev/       # Development (Core + Booking merged)
 ```
 
 ---

@@ -1,0 +1,6 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 7, "column": 0}, "map": {"version":3,"sources":["file:///home/satoshi/projects/private/nextjs-starter/templates/nextjs-saas-template/instrumentation.ts"],"sourcesContent":["export async function register() {\n  if (process.env.NEXT_RUNTIME === 'nodejs') {\n    const { logger } = await import('./lib/logger');\n    \n    // Log unhandled errors\n    process.on('unhandledRejection', (reason, promise) => {\n      logger.error({ err: reason }, 'Unhandled Promise Rejection');\n    });\n    \n    process.on('uncaughtException', (error) => {\n      logger.fatal({ err: error }, 'Uncaught Exception');\n      process.exit(1);\n    });\n  }\n}"],"names":[],"mappings":";;;AAAO,eAAe;IACpB,wCAA2C;QACzC,MAAM,EAAE,MAAM,EAAE,GAAG;QAEnB,uBAAuB;QACvB,QAAQ,EAAE,CAAC,sBAAsB,CAAC,QAAQ;YACxC,OAAO,KAAK,CAAC;gBAAE,KAAK;YAAO,GAAG;QAChC;QAEA,QAAQ,EAAE,CAAC,qBAAqB,CAAC;YAC/B,OAAO,KAAK,CAAC;gBAAE,KAAK;YAAM,GAAG;YAC7B,QAAQ,IAAI,CAAC;QACf;IACF;AACF","debugId":null}}]
+}
