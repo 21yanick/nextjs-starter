@@ -1,215 +1,342 @@
-# 🔧 System Architecture
+# 🏗️ Systemarchitektur
 
-**Self-hosted Supabase infrastructure mit universal template system**
+**Modulares NextJS Starter Kit mit selbst-gehosteter Supabase Infrastruktur**
 
-Dieses Starter Kit verwendet eine selbst-gehostete Supabase-Infrastruktur mit einem universellen Template für alle Business Models (SaaS, E-Commerce, Booking). Das System generiert spezialisierte Projekte über Environment-Konfiguration ohne unnötigen Code-Ballast.
-
-> **📖 Setup-Anweisungen**: Siehe [infrastructure/README.md](../infrastructure/README.md)
+Ein flexibles Template-System, das standardmäßig als SaaS konfiguriert ist, aber einfach für andere Anwendungen umgebaut werden kann.
 
 ---
 
-## 🏗️ System Components
+## 🎯 Architektur-Überblick
+
+Das Starter Kit besteht aus zwei Hauptkomponenten:
 
 ```
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   Next.js App   │    │  Kong Gateway   │    │   PostgreSQL    │
-│   localhost:3000│◄──►│  localhost:55321│◄──►│  localhost:55322│
-└─────────────────┘    └─────────────────┘    └─────────────────┘
-         │                       │                       │
-         │              ┌─────────────────┐              │
-         └─────────────►│ Supabase Studio │◄─────────────┘
-                        │ localhost:55323 │
-                        └─────────────────┘
+┌─────────────────────────────────────────────────────────┐
+│                    NextJS Template                     │
+│                  (template/)                          │
+│  ┌─────────────┐ ┌─────────────┐ ┌─────────────┐      │
+│  │    Pages    │ │ Components  │ │    API      │      │
+│  │ SaaS/Shop   │ │   UI/Auth   │ │   Routes    │      │
+│  └─────────────┘ └─────────────┘ └─────────────┘      │
+└─────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────┐
+│              Infrastructure Services                   │
+│               (infrastructure/)                        │
+│  ┌─────────────┐ ┌─────────────┐ ┌─────────────┐      │
+│  │ PostgreSQL  │ │    Kong     │ │   Studio    │      │
+│  │ (Database)  │ │ (Gateway)   │ │(Management) │      │
+│  └─────────────┘ └─────────────┘ └─────────────┘      │
+└─────────────────────────────────────────────────────────┘
 ```
 
-### Infrastructure Stack
-- **Docker Compose**: 13 Services (DB, Auth, Storage, Analytics, etc.)
-- **Kong API Gateway**: Zentrale API-Verwaltung mit JWT-Authentication
-- **PostgreSQL**: Business-Schema + 16 Supabase Auth-Tabellen
-- **Supabase Studio**: Database-Management Interface
+### Service-Verteilung
 
-### Template System
-- **Universal Template**: Ein Template für alle Business Models
-- **Environment-Konfiguration**: Business Model via Feature Flags
-- **Project Generator**: `./create-project.sh name model`
-- **Direct Copy**: Einfache Template → Client Projekterstellung
+| Service | Port | Zweck |
+|---------|------|-------|
+| **NextJS App** | 3000 | Template Development |
+| **Kong Gateway** | 55321 | API Gateway und Auth |
+| **Supabase Studio** | 55323 | Database Management |
+| **PostgreSQL** | 5432 | Interne Datenbank |
 
 ---
 
-## 📋 Simplified Template Architecture
+## 🗄️ Modulare Datenbank-Architektur
 
-### Universal Template (`template/`)
-**Ein Template mit allen Features:**
-- Authentication (Supabase Auth integration)
-- UI Components (Radix + Tailwind)
-- Layout System (Header, Footer, Navigation)
-- Theme Support (Dark/Light mode)
-- Email Templates (Welcome, notifications)
-- Stripe Integration (Subscriptions, Payments, Webhooks)
-- Swiss Optimization (CHF, TWINT, de-CH)
+### Schema-Module System
 
-### Business Model Support
-| Feature | SaaS | Shop | Booking |
-|---------|------|------|---------|
-| **Authentication** | ✅ | ✅ | ✅ |
-| **Subscriptions** | ✅ | ❌ | ❌ |
-| **E-Commerce** | ❌ | ✅ | ❌ |
-| **Appointments** | ❌ | ❌ | ✅ |
-| **Swiss Features** | ✅ | ✅ | ✅ |
+Das Starter Kit verwendet ein intelligentes Schema-System in `infrastructure/volumes/db/business-schema.sql`:
 
-### Generation Process
-1. **Copy Template**: `template/` → `clients/project-name/`
-2. **Configure Environment**: Business model + feature flags in `.env.local`
-3. **Update Metadata**: `package.json`, README, client-specific settings
-4. **Ready to develop**: Sofort produktionsfähig
-
----
-
-## 🗄️ Database Architecture
-
-### Business Schema (6 Tables)
 ```sql
--- Core User Management
-public.profiles         -- Extended user data + Stripe customer_id
+-- Kern-Schema (immer geladen)
+\i 00-core-schema.sql
 
--- SaaS Features  
-public.subscriptions    -- Stripe subscription management
+-- Standard: SaaS Schema (geladen)  
+\i 01-saas-schema.sql
 
--- E-Commerce Features
-public.products         -- Product catalog
-public.orders           -- Order management
-public.order_items      -- Order line items
+-- Optional: Shop Schema (auskommentiert)
+-- \i 02-shop-schema.sql
 
--- Booking Features
-public.appointments     -- Appointment scheduling
+-- Optional: Booking Schema (auskommentiert)  
+-- \i 03-booking-schema.sql
 ```
 
-### Authentication Integration
-- **16 Supabase Auth Tables**: `auth.users`, `auth.sessions`, etc.
-- **Automatic Profile Creation**: Trigger creates profile for new users
-- **Row Level Security**: Users can only access their own data
-- **JWT Integration**: Seamless frontend authentication
+### Verfügbare Schema-Module
 
-### Multi-Tenant Design
+**00-core-schema.sql** - Basis für alle Anwendungen
+- `profiles` - Erweiterte Benutzerprofile
+- Benutzer-Management und Authentication
+- Row Level Security (RLS) Policies
+
+**01-saas-schema.sql** - SaaS Funktionalität (Standard)
+- `subscriptions` - Stripe Abonnements
+- Plan-Management (free, starter, pro, enterprise)
+- Billing und Subscription-Status
+
+**02-shop-schema.sql** - E-Commerce Funktionalität (Optional)
+- `products` - Produktkatalog mit CHF-Preisen
+- `orders` - Bestellungen und Checkout
+- `order_items` - Warenkorbverwaltung
+
+**03-booking-schema.sql** - Terminhbuchung (Optional)
+- `appointments` - Terminkalender
+- `services` - Buchbare Dienstleistungen
+- `availability` - Verfügbarkeitsverwaltung
+
+### Schema-Aktivierung
+
+Um Module zu aktivieren:
+
 ```sql
--- RLS Policy Example
-CREATE POLICY "Users can only see own data" ON public.profiles
-  FOR ALL USING (auth.uid() = user_id);
+-- 1. business-schema.sql bearbeiten
+-- 2. Zeile uncomment: \i 02-shop-schema.sql
+-- 3. Docker Services neustarten
+```
+
+```bash
+cd infrastructure/
+docker compose restart supabase-db
 ```
 
 ---
 
-## ⚙️ Configuration & Environment
+## 💻 Template-Architektur
 
-### Business Model Detection
-```env
-# Runtime feature flags
-BUSINESS_MODEL=saas|shop|booking
-ENABLE_SUBSCRIPTIONS=true|false
-ENABLE_SHOP=true|false  
-ENABLE_BOOKINGS=true|false
+### Aktuelle Struktur
+
+Das Template ist standardmäßig als **SaaS** konfiguriert, enthält aber bereits Strukturen für andere Anwendungen:
+
+```
+template/
+├── app/
+│   ├── (marketing)/           # Öffentliche Seiten
+│   │   ├── page.tsx          # Landing Page (SaaS)
+│   │   ├── pricing/          # SaaS Pricing
+│   │   ├── shop/             # Shop Page (vorhanden!)
+│   │   └── features/         # Feature-Übersicht
+│   ├── dashboard/            # Geschützte Bereiche
+│   │   ├── page.tsx          # User Dashboard
+│   │   └── subscription/     # SaaS Verwaltung
+│   └── api/                  # Backend Routes
+│       ├── checkout/         # Stripe Integration
+│       └── webhooks/         # Payment Events
+├── components/
+│   ├── billing/              # SaaS Components
+│   ├── auth/                 # Authentication
+│   └── ui/                   # Base UI Components
+└── lib/
+    ├── config.ts            # Zentrale Konfiguration
+    ├── stripe/              # Payment Integration  
+    └── plans.ts             # SaaS Plan-Definitionen
 ```
 
-### Database Connection
-```env
-# Pooled connection (recommended)
-DATABASE_URL=postgresql://postgres:password@localhost:55322/postgres
+### Template-Flexibilität
 
-# Direct connection (development only)
-DATABASE_URL=postgresql://postgres:password@localhost:5432/postgres
-```
+Das Template ist so aufgebaut, dass es einfach umgebaut werden kann:
 
-### Supabase Configuration
-```env
-# Local infrastructure
-NEXT_PUBLIC_SUPABASE_URL=http://localhost:55321
-NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsI...
-SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsI...
+**SaaS → Shop Umbau:**
+1. Navigation von `/pricing` zu `/shop` ändern
+2. `components/billing/` durch `components/shop/` ersetzen
+3. `dashboard/subscription/` entfernen oder anpassen
+4. Shop Schema aktivieren (`\i 02-shop-schema.sql`)
 
-# Production: Update URLs and rotate keys
-```
+**Universell nutzbare Components:**
+- `components/auth/` - Authentication (immer benötigt)
+- `components/ui/` - Base UI Components
+- `components/layout/` - Header, Footer, Navigation
 
-### Development vs Production
-| Aspect | Development | Production |
+---
+
+## 🔧 Infrastruktur-Services
+
+### Docker Compose Stack
+
+Die Infrastructure läuft komplett in Docker und bietet:
+
+**PostgreSQL Database**
+- Automatische Schema-Initialisierung
+- Modulare SQL-Dateien
+- Row Level Security (RLS) 
+- Backup über Docker Volumes
+
+**Kong API Gateway**
+- JWT Token Validation
+- CORS und Rate Limiting
+- Zentrale API-Verwaltung
+- Health Checks
+
+**Supabase Studio**
+- Database Management Interface
+- SQL Query Interface
+- User Management
+- Real-time Data Viewer
+
+**Weitere Services:**
+- Vector (Logging)
+- Storage (File Upload)
+- Realtime (WebSocket)
+- Analytics (Usage Tracking)
+
+### Entwicklung vs. Produktion
+
+| Aspekt | Entwicklung | Produktion |
 |--------|-------------|------------|
-| **Database** | Docker PostgreSQL | Managed/Self-hosted PostgreSQL |
-| **JWT Secrets** | Demo keys | Rotated production keys |
-| **Email** | Mock SMTP (inbucket) | Real SMTP service |
-| **Analytics** | Postgres backend | External analytics |
-| **Domains** | localhost | Custom domain + SSL |
+| **Datenbank** | Docker PostgreSQL | Managed PostgreSQL |
+| **JWT Secrets** | Demo Keys | Sichere Production Keys |
+| **SSL/TLS** | HTTP (localhost) | HTTPS (Custom Domain) |
+| **Email** | Mock SMTP | Echter SMTP Service |
+| **Monitoring** | Docker Logs | External Monitoring |
 
 ---
 
-## 🔗 Integration Points
+## ⚙️ Konfiguration und Umgebung
 
-### Payment Processing
-- **Stripe Integration**: CHF currency, subscription + one-time payments
-- **Webhook Handling**: Automated subscription/order updates
-- **Test Mode**: Stripe test keys for development
+### Template-Konfiguration
 
-### Email System  
-- **Resend Integration**: Transactional emails
-- **Template System**: Welcome, password reset, notifications
-- **Development**: Mock SMTP via inbucket container
+Zentrale Konfiguration in `lib/config.ts`:
 
-### API Gateway (Kong)
-- **Authentication**: JWT token validation
-- **Authorization**: Role-based access control
-- **CORS**: Cross-origin request handling
-- **Rate Limiting**: API usage protection
+```typescript
+export const siteConfig = {
+  name: "SaaS Starter",
+  description: "100% self-hosted SaaS starter kit...",
+  currency: "CHF" as const,
+  region: "swiss" as const,
+  locale: "de-CH" as const,
+  pricing: {
+    starter: 9.90,
+    pro: 19.90
+  }
+}
+```
 
-### Monitoring & Analytics
-- **Supabase Analytics**: Usage statistics
-- **Vector Logging**: Centralized log collection
-- **Health Checks**: Container status monitoring
-- **Performance**: Database query analysis
+### Environment-Variablen
 
----
+Template `.env.local` (bereits konfiguriert):
 
-## 🚀 Architecture Benefits
+```env
+# Supabase Connection
+NEXT_PUBLIC_SUPABASE_URL=http://localhost:55321
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIs...
 
-### Simplified Template Benefits
-- **No Code Ballast**: Feature flags aktivieren nur benötigte Features
-- **Rapid Deployment**: 15-minute project generation
-- **Single Source of Truth**: Ein Template für alle Projekte
-- **Easy Maintenance**: Updates an einer Stelle
+# Stripe Integration
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_...
+STRIPE_SECRET_KEY=sk_test_...
 
-### Self-Hosting Benefits
-- **Full Control**: No vendor lock-in or usage limits
-- **Cost Predictable**: Fixed infrastructure costs
-- **Data Ownership**: Complete data control and privacy
-- **Custom Extensions**: Modify Supabase as needed
+# Application
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+```
 
-### Scalability Design
-- **Connection Pooling**: Supavisor handles connection limits
-- **Horizontal Scaling**: Container-based architecture
-- **Database Optimization**: Indexed queries + RLS efficiency
-- **CDN Ready**: Static asset optimization
+### Keine Feature Flags
 
----
+Das Template verwendet **keine Environment-basierten Feature Flags**. Stattdessen:
 
-## 🔧 Development Workflow
-
-### Local Development
-1. **Start Infrastructure**: `docker compose up -d`
-2. **Generate Project**: `./create-project.sh myapp saas`
-3. **Install Dependencies**: `pnpm install`
-4. **Start Development**: `pnpm run dev`
-
-### Database Management
-- **Schema Changes**: Edit `business-schema.sql` + restart containers
-- **Migrations**: Manual SQL execution via Studio or CLI
-- **Seeding**: Test data scripts in `infrastructure/scripts/`
-- **Backup**: Docker volume persistence + manual exports
-
-### Project Customization
-- **Branding**: Update logo, colors, fonts in components
-- **Features**: Enable/disable via environment flags
-- **Schema**: Extend business tables as needed
-- **Integrations**: Add new services via environment config
+- **Modulare Struktur**: Pages und Components nach Bedarf
+- **SQL Module**: Schema nach Bedarf aktivieren
+- **Einfacher Umbau**: Code-Level Anpassungen
 
 ---
 
-**Architecture Status**: Production-Ready ✅  
-**Setup Guide**: [infrastructure/README.md](../infrastructure/README.md)  
-**Version**: NextJS Starter Kit v3.0 - Simplified Edition
+## 🔄 Development Workflow
+
+### Lokale Entwicklung
+
+```bash
+# 1. Infrastructure starten
+cd infrastructure/
+docker compose up -d
+
+# 2. Template entwickeln
+cd template/
+pnpm install
+pnpm run dev
+```
+
+### Schema-Anpassungen
+
+```bash
+# 1. SQL-Datei bearbeiten
+vi infrastructure/volumes/db/business-schema.sql
+
+# 2. Database neustarten  
+docker compose restart supabase-db
+
+# 3. Änderungen in Studio überprüfen
+open http://localhost:55323
+```
+
+### Template-Anpassungen
+
+```bash
+# 1. Template-Dateien anpassen
+# 2. Development Server läuft automatisch weiter
+# 3. Änderungen sind sofort sichtbar
+```
+
+---
+
+## 🏗️ Skalierung und Erweiterung
+
+### Template Erweiterung
+
+Das Template kann einfach erweitert werden:
+
+1. **Neue Pages**: `app/` Verzeichnis
+2. **Neue Components**: `components/` Verzeichnis  
+3. **Neue API Routes**: `app/api/` Verzeichnis
+4. **Neue Schemas**: `volumes/db/` SQL-Dateien
+
+### Infrastructure Scaling
+
+Für Production Deployment:
+
+1. **Managed Database**: PostgreSQL Cloud Service
+2. **Load Balancer**: Multiple App Instances
+3. **CDN**: Static Asset Delivery
+4. **Monitoring**: External Monitoring Service
+
+### Modulare Entwicklung
+
+Das System unterstützt modulare Entwicklung:
+
+- **Schema-Module**: SQL nach Bedarf laden
+- **Component-Module**: UI nach Anwendung
+- **Service-Integration**: APIs nach Bedarf
+- **Template-Varianten**: Verschiedene Anwendungen
+
+---
+
+## 📊 Überwachung und Logs
+
+### Development Monitoring
+
+```bash
+# Service Status
+docker compose ps
+
+# Live Logs  
+docker compose logs -f
+
+# Database Status
+docker exec supabase-db pg_isready -U postgres
+```
+
+### Studio Interface
+
+- **Tables**: Schema und Daten verwalten
+- **Authentication**: Benutzer-Management
+- **Storage**: Datei-Upload verwalten
+- **SQL Editor**: Direkte Datenbankabfragen
+
+### Performance Monitoring
+
+- **Next.js Build**: Bundle-Größe Analyse
+- **Database**: Query Performance
+- **Docker**: Container Resource Usage
+- **Network**: API Response Times
+
+---
+
+**Status:** Production-Ready ✅  
+**Modular:** Schema + Template ✅  
+**Flexibel:** SaaS/Shop/Booking ✅

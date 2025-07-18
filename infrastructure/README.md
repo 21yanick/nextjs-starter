@@ -1,277 +1,255 @@
-# 🇨🇭 Supabase Setup - Swiss NextJS Starter Kit
+# Infrastructure Setup
 
-**Automatisches, selbst-gehostetes Supabase-System für Schweizer Entwickler**
+**Self-hosted Supabase development stack with Docker Compose**
 
-## 🎯 Überblick
+Provides complete backend infrastructure for the NextJS starter template.
 
-Dieses Starter Kit verwendet ein **vollständig automatisiertes Supabase-Setup** mit Docker-Compose. Keine manuelle Konfiguration, keine Cloud-Abhängigkeiten - alles läuft lokal und produktionsreif.
+## 🚀 Quick Start
 
-### ✅ Was funktioniert automatisch:
-- **Database Setup**: 22 Tabellen (6 Business + 16 Auth) werden automatisch erstellt
-- **Auth System**: Email-Registrierung mit Auto-Bestätigung
-- **Business Schema**: SaaS, E-Commerce und Booking-ready
-- **Swiss-Only**: CHF, de-CH, TWINT optimiert
-- **JWT-Keys**: Synchronisiert zwischen Infrastructure und Templates
-
----
-
-## 🚀 Schnellstart
-
-### 1. Infrastructure starten
 ```bash
 cd infrastructure
 docker compose up -d
 ```
 
-### 2. Projekt erstellen
+**Services:** [API](http://localhost:55321) | [Studio](http://localhost:55323) | [Analytics](http://localhost:4000)
+
+## 🐳 Services Overview
+
+| Service | Port | Purpose |
+|---------|------|---------|
+| **Kong Gateway** | 55321 | API gateway and authentication |
+| **Supabase Studio** | 55323 | Database management interface |
+| **PostgreSQL** | 5432 | Main database (internal) |
+| **Analytics** | 4000 | Usage analytics dashboard |
+
+### Complete Stack
+- **Authentication:** GoTrue auth server
+- **Database:** PostgreSQL 15 with Row Level Security
+- **Storage:** File storage and image processing
+- **Realtime:** WebSocket subscriptions
+- **Analytics:** Usage tracking and monitoring
+
+## 🔧 Configuration
+
+### Environment Setup
+Copy and customize the environment configuration:
+
 ```bash
-./create-project.sh mein-projekt saas
-cd ../clients/mein-projekt
-pnpm install
-pnpm run dev
+cp .env.example .env.local
 ```
 
-### 3. Testen
-- **App**: http://localhost:3000
-- **Studio**: http://localhost:55323
-- **Account erstellen**: http://localhost:3000/auth/register
+### Required Variables
+```env
+# Database
+POSTGRES_PASSWORD=your-secure-password
+JWT_SECRET=your-jwt-secret-32-chars-min
 
----
+# Authentication Keys
+ANON_KEY=your_anon_key
+SERVICE_ROLE_KEY=your_service_role_key
 
-## 🏗️ System-Architektur
-
-### Container-Stack
-```
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   NextJS App    │    │  Supabase       │    │   PostgreSQL    │
-│   localhost:3000│◄──►│  localhost:55321│◄──►│  localhost:55322│
-└─────────────────┘    └─────────────────┘    └─────────────────┘
-         │                       │                       │
-         │              ┌─────────────────┐              │
-         └─────────────►│ Supabase Studio │◄─────────────┘
-                        │ localhost:55323 │
-                        └─────────────────┘
+# Services
+KONG_HTTP_PORT=55321
+STUDIO_PORT=55323
 ```
 
-### Port-Matrix
-| Service | Port | URL | Zweck |
-|---------|------|-----|-------|
-| **NextJS App** | 3000 | http://localhost:3000 | Hauptanwendung |
-| **Supabase API** | 55321 | http://localhost:55321 | REST API Gateway |
-| **PostgreSQL** | 55322 | localhost:55322 | Direkte DB-Verbindung |
-| **Supabase Studio** | 55323 | http://localhost:55323 | Database Management |
+### Automatic Setup
+The infrastructure automatically:
+- Creates database tables and schemas
+- Configures Row Level Security policies
+- Sets up authentication flows
+- Initializes sample data (optional)
 
----
+## 📊 Database Schema
 
-## 📋 Database Schema
-
-### Business-Tabellen (6 Stück)
+### Core Tables
 ```sql
-public.profiles        -- User-Profile (erweitert auth.users)
-public.subscriptions   -- SaaS-Abonnements (Stripe-Integration)
-public.products        -- E-Commerce-Produkte (CHF-Preise)
-public.orders          -- Bestellungen (Swiss-optimiert)
-public.order_items     -- Bestellpositionen
-public.appointments    -- Terminbuchungen (Europe/Zurich)
+-- Authentication (managed by Supabase)
+auth.users                 -- User accounts
+auth.sessions              -- Login sessions
+
+-- Application tables
+public.profiles            -- Extended user profiles
+public.subscriptions       -- Payment subscriptions
 ```
 
-### Auth-Tabellen (16 Stück)
-```sql
-auth.users            -- Benutzer-Accounts
-auth.sessions         -- Login-Sessions
-auth.refresh_tokens   -- JWT-Refresh-Tokens
-auth.identities       -- OAuth-Identitäten
-... (12 weitere Supabase-System-Tabellen)
-```
+### Schema Management
+- **Initialization:** `volumes/db/*.sql` files run automatically
+- **Migrations:** Add new `.sql` files to `volumes/db/`
+- **Reset:** `docker compose down -v && docker compose up -d`
 
-### Swiss-Only Optimierungen
-- **Währung**: CHF (Rappen-basiert)
-- **Zeitzone**: Europe/Zurich
-- **Locale**: de-CH (Schweizer Deutsch)
-- **Zahlungen**: Kreditkarten + TWINT
-- **Geschäftszeiten**: 09:00-18:00 (Mon-Fri)
+## 🛠️ Development Commands
 
----
-
-## 🔧 Entwicklung
-
-### Projekt-Struktur
-```
-nextjs-starter/
-├── infrastructure/           # Supabase-Infrastructure
-│   ├── docker-compose.yml   # Container-Orchestrierung
-│   ├── .env                 # Infrastructure-Konfiguration
-│   ├── volumes/db/          # Database-Initialisierung
-│   │   ├── business-schema.sql  # Business-Tabellen
-│   │   ├── realtime.sql         # Supabase-Realtime
-│   │   └── ... (System-Dateien)
-│   └── scripts/             # Client-Utilities
-├── templates/               # Projekt-Templates
-│   ├── nextjs-core/         # Basis-Template
-│   ├── nextjs-saas-template/    # SaaS-spezifisch
-│   ├── nextjs-shop-template/    # E-Commerce-spezifisch
-│   └── nextjs-booking-template/ # Booking-spezifisch
-└── clients/                 # Generierte Projekte
-    └── mein-projekt/        # Dein Projekt
-```
-
-### Template-System
+### Service Management
 ```bash
-# SaaS-Projekt (Subscriptions)
-./create-project.sh kunde-portal saas
+# Start services
+docker compose up -d
 
-# E-Commerce-Shop
-./create-project.sh online-shop shop
+# Stop services  
+docker compose down
 
-# Booking-System
-./create-project.sh beauty-salon booking
+# View logs
+docker compose logs -f [service-name]
+
+# Service status
+docker compose ps
 ```
 
-### Environment-Konfiguration
-Alle generierten Projekte erhalten automatisch:
-- Korrekte Supabase-URLs und Keys
-- Swiss-Only Business-Konfiguration
-- Database-Verbindung (Pooler)
-- Stripe-Integration (Test-Keys)
-
----
-
-## 🔍 Troubleshooting
-
-### Infrastructure-Probleme
-
-**Container starten nicht:**
+### Database Access
 ```bash
-cd infrastructure
+# PostgreSQL CLI
+docker exec -it supabase-db psql -U postgres -d postgres
+
+# Database reset (⚠️ deletes data)
 docker compose down -v
 docker compose up -d
 ```
 
-**Database-Reset (Datenverlust!):**
+### Health Checks
 ```bash
-docker compose down
-sudo rm -rf volumes/db/data/*
-docker compose up -d
+# API status
+curl http://localhost:55321/health
+
+# Studio access
+curl http://localhost:55323
+
+# Database connection
+docker exec supabase-db pg_isready -U postgres
 ```
 
-**Port-Konflikte:**
+## 🔍 Service Details
+
+### Kong API Gateway (Port 55321)
+- Routes requests to appropriate services
+- Handles JWT authentication
+- Provides CORS and rate limiting
+- Health endpoint: `/health`
+
+### Supabase Studio (Port 55323)
+- Database schema browser
+- Table editor and SQL runner
+- User management interface
+- Authentication configuration
+
+### PostgreSQL Database
+- Internal port 5432 (not exposed)
+- Accessed via Kong gateway or direct connection
+- Automatic backups via Docker volumes
+- Connection pooling with Supavisor
+
+## 🚨 Troubleshooting
+
+### Common Issues
+
+**Services won't start:**
 ```bash
-# Prüfe welche Ports belegt sind
+# Check ports are free
 netstat -tulpn | grep :55321
-netstat -tulpn | grep :55322
 netstat -tulpn | grep :55323
+
+# Restart Docker Desktop
+# Then: docker compose up -d
 ```
 
-### Auth-Probleme
-
-**"Invalid authentication credentials":**
-- JWT-Keys zwischen Infrastructure und Client stimmen nicht überein
-- Lösung: Projekt neu generieren mit `./create-project.sh`
-
-**User kann sich nicht registrieren:**
-- Prüfe Supabase Studio → Authentication → Settings
-- `ENABLE_EMAIL_AUTOCONFIRM` sollte `true` sein
-
-**Hydration-Fehler:**
-- Theme-Toggle-Problem in NextJS 15
-- Lösung: Template wurde bereits gefixt
-
-### Performance-Probleme
-
-**Langsame Database-Queries:**
+**Database connection failed:**
 ```bash
-# Prüfe Container-Performance
-docker stats
+# Check database logs
+docker compose logs supabase-db
+
+# Verify environment variables
+docker compose logs kong
 ```
 
-**Supabase Studio langsam:**
+**Studio not accessible:**
 ```bash
-# Restart Studio-Container
+# Restart studio service
 docker compose restart studio
+
+# Check studio logs
+docker compose logs studio
 ```
 
----
-
-## 🛠️ Erweiterte Konfiguration
-
-### Custom Business-Schema
-Business-Tabellen können in `infrastructure/volumes/db/business-schema.sql` angepasst werden.
-
-**Nach Änderungen:**
+### Performance Issues
 ```bash
-docker compose down
-sudo rm -rf volumes/db/data/*
+# Check container resources
+docker stats
+
+# View service logs
+docker compose logs --tail=50 -f
+```
+
+### Complete Reset
+```bash
+# Nuclear option - deletes all data
+docker compose down -v
+docker system prune -f
 docker compose up -d
 ```
 
-### Produktions-Setup
-1. **Secrets ändern** in `infrastructure/.env`
-2. **Domain konfigurieren** in `SITE_URL`
-3. **SMTP-Server** für E-Mail-Versand
-4. **Stripe-Keys** für Zahlungen
-5. **Backup-Strategie** für PostgreSQL
+## 🔐 Security
 
-### Monitoring
-- **Logs**: `docker compose logs -f`
-- **Database**: Supabase Studio → SQL Editor
-- **Performance**: Docker Stats + PostgreSQL-Monitoring
+### Development vs Production
 
----
+**Development (current setup):**
+- Demo JWT secrets (insecure)
+- Auto-confirm user registration
+- Permissive CORS settings
+- Local-only access
 
-## 📈 Nächste Schritte
+**Production recommendations:**
+1. Generate secure JWT secrets
+2. Configure proper SMTP for email
+3. Set up SSL/TLS termination
+4. Configure firewall rules
+5. Set up database backups
 
-### Nach dem Setup:
-1. **Test-User erstellen** → http://localhost:3000/auth/register
-2. **Supabase Studio erkunden** → http://localhost:55323
-3. **Stripe-Integration testen** → Test-Keys konfigurieren
-4. **Business-Logic entwickeln** → TypeScript + Supabase Client
+### JWT Key Management
+The infrastructure uses demo JWT keys for development. For production:
 
-### Produktions-Deployment:
-1. **Infrastructure-Secrets** anpassen
-2. **Domain & SSL** konfigurieren
-3. **Backup-System** implementieren
-4. **Monitoring** einrichten
-
----
-
-## 🎯 Support
-
-### Dokumentation
-- **Supabase Docs**: https://supabase.com/docs
-- **NextJS Docs**: https://nextjs.org/docs
-- **Stripe Docs**: https://stripe.com/docs
-
-### System-Status prüfen
 ```bash
-# Alle Container-Status
+# Generate new JWT secret
+openssl rand -base64 32
+
+# Update .env.local with new keys
+# Restart services: docker compose restart
+```
+
+## 📈 Monitoring
+
+### Container Health
+```bash
+# All service status
 docker compose ps
 
-# Logs von spezifischem Service
-docker compose logs auth
-docker compose logs db
+# Resource usage
+docker stats
 
-# Database-Verbindung testen
-docker exec supabase-db psql -U postgres -d postgres -c "SELECT NOW();"
+# Service logs
+docker compose logs [service-name]
 ```
 
-### Häufige Befehle
-```bash
-# Infrastructure neu starten
-docker compose restart
+### Database Monitoring
+- **Studio Dashboard:** Real-time database metrics
+- **Analytics Dashboard:** User and API statistics
+- **Logs:** Structured logging via Vector
 
-# Database-Tabellen anzeigen
-docker exec supabase-db psql -U postgres -d postgres -c "\dt"
+## 🚀 Production Deployment
 
-# Neues Projekt erstellen
-./create-project.sh projekt-name saas
+### Infrastructure Migration
+1. **Database:** Migrate to managed PostgreSQL
+2. **Environment:** Set production secrets
+3. **Networking:** Configure reverse proxy/load balancer
+4. **Monitoring:** Set up external monitoring
+5. **Backups:** Implement backup strategy
 
-# Template-Keys synchronisieren (bei Problemen)
-rm -rf ../clients/projekt-name
-./create-project.sh projekt-name saas
-```
+### Scaling Considerations
+- **Connection Pooling:** Supavisor handles connection limits
+- **Read Replicas:** For high-read workloads
+- **Caching:** Redis for session/query caching
+- **CDN:** For static asset delivery
 
 ---
 
-**Status**: Production-Ready ✅  
-**Letzte Aktualisierung**: 2025-07-16  
-**Version**: Swiss NextJS Starter Kit v2.0
+**Status:** Development Ready ✅  
+**Production:** Requires security hardening ⚠️  
+**Support:** [Supabase Docs](https://supabase.com/docs)
