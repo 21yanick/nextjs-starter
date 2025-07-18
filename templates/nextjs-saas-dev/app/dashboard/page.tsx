@@ -1,14 +1,60 @@
-import { requireAuth, getUserProfile } from '@/lib/supabase/server';
+'use client'
+
 import { Container } from '@/components/ui/container';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { CalendarDays, Mail, User } from 'lucide-react';
+import { CalendarDays, Mail, User, CreditCard } from 'lucide-react';
+import { useUser } from '@/hooks/use-user';
+import { useSubscription } from '@/hooks/use-subscription';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 
-export default async function DashboardPage() {
-  // This will redirect to login if not authenticated
-  const user = await requireAuth();
-  const profile = await getUserProfile();
+export default function DashboardPage() {
+  const { user, loading: userLoading } = useUser();
+  const { userPlan, loading: planLoading } = useSubscription();
+  const router = useRouter();
+
+  // Client-side authentication guard
+  useEffect(() => {
+    if (!userLoading && !user) {
+      router.push('/auth/login');
+    }
+  }, [user, userLoading, router]);
+
+  // Loading state
+  if (userLoading || planLoading) {
+    return (
+      <div className="py-8">
+        <Container>
+          <div className="space-y-8">
+            <div>
+              <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
+              <p className="text-muted-foreground">Loading...</p>
+            </div>
+          </div>
+        </Container>
+      </div>
+    );
+  }
+
+  // Not authenticated
+  if (!user) {
+    return null; // Will redirect via useEffect
+  }
+
+  // Client-side plan info
+  const getPlanInfo = (planType: string) => {
+    const plans = {
+      free: { name: 'Free', price: 0, currency: 'CHF' },
+      starter: { name: 'Starter', price: 9.90, currency: 'CHF' },
+      pro: { name: 'Professional', price: 19.90, currency: 'CHF' },
+    };
+    return plans[planType as keyof typeof plans] || plans.free;
+  };
+
+  const planInfo = getPlanInfo(userPlan?.type || 'free');
 
   const initials = user.email
     ? user.email.substring(0, 2).toUpperCase()
@@ -36,7 +82,7 @@ export default async function DashboardPage() {
                 </Avatar>
                 <div>
                   <p className="text-lg font-semibold">
-                    Welcome back, {profile?.full_name || user.email}!
+                    Welcome back, {user.email}!
                   </p>
                   <p className="text-sm text-muted-foreground">
                     {user.email}
@@ -87,13 +133,36 @@ export default async function DashboardPage() {
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Subscription</CardTitle>
-                <Badge variant="outline">Free</Badge>
+                <Badge variant={userPlan?.type === 'free' ? 'secondary' : 'default'}>
+                  {userPlan?.type === 'free' ? '🆓' : userPlan?.type === 'starter' ? '🟡' : '🟢'} {planInfo.name}
+                </Badge>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">Free Plan</div>
-                <p className="text-xs text-muted-foreground">
-                  Upgrade to unlock more features
-                </p>
+                <div className="text-2xl font-bold">
+                  {planInfo.price === 0 ? 'Free Plan' : `${planInfo.currency} ${planInfo.price.toFixed(2)}`}
+                </div>
+                <div className="space-y-1">
+                  {userPlan?.type === 'free' ? (
+                    <p className="text-xs text-muted-foreground">
+                      <Link href="/dashboard/subscription" className="hover:underline">
+                        Upgrade to unlock more features
+                      </Link>
+                    </p>
+                  ) : (
+                    <>
+                      {userPlan?.subscription?.currentPeriodEnd && (
+                        <p className="text-xs text-muted-foreground">
+                          Next billing: {new Date(userPlan.subscription.currentPeriodEnd).toLocaleDateString()}
+                        </p>
+                      )}
+                      <p className="text-xs text-muted-foreground">
+                        <Link href="/dashboard/subscription" className="hover:underline">
+                          Manage subscription
+                        </Link>
+                      </p>
+                    </>
+                  )}
+                </div>
               </CardContent>
             </Card>
 

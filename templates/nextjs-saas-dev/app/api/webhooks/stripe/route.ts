@@ -6,6 +6,14 @@ import Stripe from 'stripe'
 
 const logger = getLogger('stripe-webhook')
 
+// Map Stripe price IDs to plan types using environment variables
+function getPlanTypeFromPriceId(priceId: string): 'free' | 'starter' | 'pro' | 'enterprise' {
+  if (priceId === process.env.STRIPE_STARTER_PRICE_ID) return 'starter'
+  if (priceId === process.env.STRIPE_PRO_PRICE_ID) return 'pro'
+  if (priceId === process.env.STRIPE_ENTERPRISE_PRICE_ID) return 'enterprise'
+  return 'free'
+}
+
 // Create Supabase client with service role for webhook operations
 function createServiceClient() {
   return createServerClient(
@@ -72,18 +80,21 @@ export async function POST(request: NextRequest) {
 
         // Upsert subscription
         const firstItem = subscription.items.data[0]
+        const planType = getPlanTypeFromPriceId(firstItem?.price.id || '')
+        
         const { error } = await supabase
           .from('subscriptions')
           .upsert({
             user_id: profile.id,
             stripe_subscription_id: subscription.id,
             stripe_price_id: firstItem?.price.id,
+            plan_type: planType,
             status: subscription.status,
-            current_period_start: firstItem?.current_period_start 
-              ? new Date(firstItem.current_period_start * 1000).toISOString()
+            current_period_start: subscription.current_period_start 
+              ? new Date(subscription.current_period_start * 1000).toISOString()
               : null,
-            current_period_end: firstItem?.current_period_end
-              ? new Date(firstItem.current_period_end * 1000).toISOString()
+            current_period_end: subscription.current_period_end
+              ? new Date(subscription.current_period_end * 1000).toISOString()
               : null,
             updated_at: new Date().toISOString(),
           })

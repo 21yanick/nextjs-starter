@@ -7,17 +7,30 @@ import { useState } from 'react'
 import Link from 'next/link'
 
 interface CheckoutButtonProps {
-  priceId: string
+  priceId: string | null
   planName: string
   popular?: boolean
+  isFree?: boolean
 }
 
-export function CheckoutButton({ priceId, planName, popular = false }: CheckoutButtonProps) {
+export function CheckoutButton({ priceId, planName, popular = false, isFree = false }: CheckoutButtonProps) {
   const { user, loading } = useUser()
   const [isCreatingSession, setIsCreatingSession] = useState(false)
 
   const handleCheckout = async () => {
     if (!user) return
+
+    // Free plan - go directly to dashboard
+    if (isFree) {
+      window.location.href = '/dashboard'
+      return
+    }
+
+    // Paid plans - create Stripe checkout
+    if (!priceId) {
+      console.error('Price ID required for paid plans')
+      return
+    }
 
     setIsCreatingSession(true)
     try {
@@ -59,7 +72,7 @@ export function CheckoutButton({ priceId, planName, popular = false }: CheckoutB
         asChild
       >
         <Link href="/auth/register">
-          Get Started
+          {isFree ? 'Get Started' : `Subscribe to ${planName}`}
           <ArrowRight className="ml-2 h-4 w-4" />
         </Link>
       </Button>
@@ -77,7 +90,7 @@ export function CheckoutButton({ priceId, planName, popular = false }: CheckoutB
         <Loader2 className="h-4 w-4 animate-spin" />
       ) : (
         <>
-          Subscribe to {planName}
+          {isFree ? 'Start Free' : `Subscribe to ${planName}`}
           <ArrowRight className="ml-2 h-4 w-4" />
         </>
       )}

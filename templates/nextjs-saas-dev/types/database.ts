@@ -39,6 +39,7 @@ export type Database = {
           user_id: string;
           stripe_subscription_id: string;
           stripe_price_id: string;
+          plan_type: 'free' | 'starter' | 'pro' | 'enterprise';
           status: string;
           current_period_start: string | null;
           current_period_end: string | null;
@@ -50,6 +51,7 @@ export type Database = {
           user_id: string;
           stripe_subscription_id: string;
           stripe_price_id: string;
+          plan_type: 'free' | 'starter' | 'pro' | 'enterprise';
           status: string;
           current_period_start?: string | null;
           current_period_end?: string | null;
@@ -61,6 +63,7 @@ export type Database = {
           user_id?: string;
           stripe_subscription_id?: string;
           stripe_price_id?: string;
+          plan_type?: 'free' | 'starter' | 'pro' | 'enterprise';
           status?: string;
           current_period_start?: string | null;
           current_period_end?: string | null;
