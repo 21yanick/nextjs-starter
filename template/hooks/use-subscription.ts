@@ -4,11 +4,13 @@ import { useState, useEffect, useCallback } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useUser } from './use-user';
 import type { Database } from '@/types/database';
+import type { ServerUserPlan } from '@/lib/auth/server';
+import type { PlanType } from '@/lib/plans';
 
 type Subscription = Database['public']['Tables']['subscriptions']['Row'];
 
 export interface UserPlan {
-  type: 'free' | 'starter' | 'pro' | 'enterprise';
+  type: PlanType;
   subscription?: {
     id: string;
     stripeSubscriptionId: string;
@@ -19,10 +21,17 @@ export interface UserPlan {
   };
 }
 
-export function useSubscription() {
+export function useSubscription(initialData?: ServerUserPlan) {
   const { user, loading: userLoading } = useUser();
-  const [userPlan, setUserPlan] = useState<UserPlan | null>(null);
-  const [loading, setLoading] = useState(true);
+  
+  // Initialize with server-side data if available
+  const [userPlan, setUserPlan] = useState<UserPlan | null>(
+    initialData ? {
+      type: initialData.type,
+      subscription: initialData.subscription
+    } : null
+  );
+  const [loading, setLoading] = useState(!initialData); // Skip loading if we have initial data
   const [error, setError] = useState<string | null>(null);
 
   const fetchSubscription = useCallback(async () => {
@@ -77,12 +86,12 @@ export function useSubscription() {
     }
   }, [user]);
 
-  // Fetch subscription when user changes
+  // Fetch subscription when user changes (only if no initial data provided)
   useEffect(() => {
-    if (!userLoading) {
+    if (!userLoading && !initialData) {
       fetchSubscription();
     }
-  }, [user, userLoading, fetchSubscription]);
+  }, [user, userLoading, fetchSubscription, initialData]);
 
   // Refresh function for manual updates
   const refresh = useCallback(async () => {

@@ -4,10 +4,18 @@ import { Button } from '@/components/ui/button'
 import { useSubscription } from '@/hooks/use-subscription'
 import { useState } from 'react'
 import { ArrowUp, X, Loader2 } from 'lucide-react'
+import type { ServerUserPlan } from '@/lib/auth/server'
 
-export function PlanActions() {
-  const { userPlan, planType, refresh } = useSubscription()
+interface PlanActionsProps {
+  initialData?: ServerUserPlan;
+}
+
+export function PlanActions({ initialData }: PlanActionsProps) {
+  const { userPlan, planType, refresh } = useSubscription(initialData)
   const [loading, setLoading] = useState<string | null>(null)
+
+  // Get current plan type from hook or initial data
+  const currentPlanType = planType || initialData?.type || 'free'
 
   const handleUpgrade = async (targetPlan: 'starter' | 'pro') => {
     setLoading(`upgrade-${targetPlan}`)
@@ -37,12 +45,13 @@ export function PlanActions() {
   }
 
   const handleCancel = async () => {
-    if (!userPlan?.subscription) return
+    const subscription = userPlan?.subscription || initialData?.subscription
+    if (!subscription) return
 
     setLoading('cancel')
     try {
       // TODO: Implement cancel subscription API
-      console.log('Cancel subscription:', userPlan.subscription.id)
+      console.log('Cancel subscription:', subscription.id)
       // For now, just refresh
       await refresh()
     } catch (error) {
@@ -55,7 +64,7 @@ export function PlanActions() {
   return (
     <div className="space-y-3">
       {/* Free Plan Actions */}
-      {planType === 'free' && (
+      {currentPlanType === 'free' && (
         <div className="space-y-2">
           <Button 
             className="w-full" 
@@ -91,7 +100,7 @@ export function PlanActions() {
       )}
 
       {/* Starter Plan Actions */}
-      {planType === 'starter' && (
+      {currentPlanType === 'starter' && (
         <div className="space-y-2">
           <Button 
             className="w-full"
@@ -127,7 +136,7 @@ export function PlanActions() {
       )}
 
       {/* Pro Plan Actions */}
-      {planType === 'pro' && (
+      {currentPlanType === 'pro' && (
         <div className="space-y-2">
           <Button 
             variant="outline" 

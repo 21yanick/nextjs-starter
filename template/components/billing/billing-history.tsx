@@ -5,19 +5,23 @@ import { Badge } from '@/components/ui/badge'
 import { CalendarDays, CreditCard, Download } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
-export function BillingHistory() {
-  // Mock billing history data
-  const billingHistory = [
-    {
-      id: 'inv_001',
-      date: '2024-01-15',
-      amount: 9.90,
-      currency: 'CHF',
-      status: 'paid',
-      plan: 'Starter',
-      invoiceUrl: '#'
-    }
-  ]
+interface BillingHistoryItem {
+  id: string;
+  date: string;
+  amount: number;
+  currency: string;
+  status: 'paid' | 'pending' | 'failed';
+  plan: string;
+  invoiceUrl: string;
+}
+
+interface BillingHistoryProps {
+  initialData?: BillingHistoryItem[];
+}
+
+export function BillingHistory({ initialData = [] }: BillingHistoryProps) {
+  // Use server-provided initial data (fallback to empty array)
+  const billingHistory = initialData
 
   return (
     <Card>

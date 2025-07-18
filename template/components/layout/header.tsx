@@ -3,7 +3,7 @@ import { Container } from "@/components/layout/container"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { AuthButton } from "@/components/auth"
-import { ThemeToggle } from "@/components/theme-toggle"
+import { ThemeToggle } from "@/components/theme"
 import { getBusinessConfig, getAvailableFeatures } from "@/lib/business-config"
 
 export function Header() {

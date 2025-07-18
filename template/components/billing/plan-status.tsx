@@ -4,11 +4,18 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge'
 import { useSubscription } from '@/hooks/use-subscription'
 import { CalendarDays, CreditCard } from 'lucide-react'
+import { getPlan } from '@/lib/plans'
+import type { ServerUserPlan } from '@/lib/auth/server'
 
-export function PlanStatus() {
-  const { userPlan, loading, planType } = useSubscription()
+interface PlanStatusProps {
+  initialData?: ServerUserPlan;
+}
 
-  if (loading) {
+export function PlanStatus({ initialData }: PlanStatusProps) {
+  // Use server-side initial data, fall back to hook for real-time updates
+  const { userPlan, loading, planType } = useSubscription(initialData)
+
+  if (loading && !initialData) {
     return (
       <Card>
         <CardHeader>
@@ -19,34 +26,18 @@ export function PlanStatus() {
     )
   }
 
-  // Client-side plan info  
-  const getPlanInfo = (planType: string) => {
-    const plans = {
-      free: { name: 'Free', price: 0, currency: 'CHF', interval: 'month', description: 'Perfect for getting started' },
-      starter: { name: 'Starter', price: 9.90, currency: 'CHF', interval: 'month', description: 'Essential features for small projects' },
-      pro: { name: 'Professional', price: 19.90, currency: 'CHF', interval: 'month', description: 'Advanced features for growing businesses' },
-    };
-    return plans[planType as keyof typeof plans] || plans.free;
-  };
-
-  const planInfo = getPlanInfo(planType)
-  const subscription = userPlan?.subscription
-
-  // Badge variant based on plan
-  const badgeVariant = planType === 'free' ? 'secondary' : 
-                      planType === 'starter' ? 'outline' : 'default'
-
-  // Plan icon
-  const planIcon = planType === 'free' ? '🆓' : 
-                   planType === 'starter' ? '🟡' : '🟢'
+  // Use centralized plan configuration
+  const currentPlanType = planType || initialData?.type || 'free'
+  const planInfo = getPlan(currentPlanType)
+  const subscription = userPlan?.subscription || initialData?.subscription
 
   return (
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center justify-between">
           <span>Current Plan</span>
-          <Badge variant={badgeVariant}>
-            {planIcon} {planInfo.name}
+          <Badge variant={planInfo.badgeVariant}>
+            {planInfo.icon} {planInfo.name}
           </Badge>
         </CardTitle>
         <CardDescription>{planInfo.description}</CardDescription>
@@ -74,7 +65,7 @@ export function PlanStatus() {
 
         {/* Status indicator */}
         <div className="text-xs text-muted-foreground">
-          {planType === 'free' ? 'No subscription required' :
+          {currentPlanType === 'free' ? 'No subscription required' :
            subscription?.status === 'active' ? 'Active subscription' :
            'Subscription inactive'}
         </div>

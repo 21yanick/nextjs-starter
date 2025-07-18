@@ -2,7 +2,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { getBusinessConfig, formatCurrency } from '@/lib/business-config'
-import { CheckoutButton } from '@/components/checkout-button'
+import { CheckoutButton } from '@/components/billing'
 import { Check } from 'lucide-react'
 import { env } from '@/lib/env'
 import Link from 'next/link'
