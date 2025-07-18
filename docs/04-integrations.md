@@ -1,6 +1,6 @@
 # 🔗 Service Integrations
 
-**Production-ready Service-Integration mit CHF-Optimierung und Template-spezifischen Workflows**
+**Production-ready Service-Integration mit CHF-Optimierung und konfigurierbaren Features**
 
 Das Starter Kit integriert professionelle Services für Payment, Email, Monitoring und Analytics. Alle Services sind für den Schweizer Markt optimiert mit CHF-Währung, TWINT-Unterstützung und de-CH Lokalisierung.
 
@@ -8,17 +8,17 @@ Das Starter Kit integriert professionelle Services für Payment, Email, Monitori
 
 ## 🔄 Integration Overview
 
-| Service | Purpose | Template Support | Swiss Optimization |
-|---------|---------|------------------|-------------------|
-| **Stripe** | Payments | SaaS, Shop, Booking | ✅ CHF + TWINT |
-| **Resend** | Email | All Templates | ✅ German Templates |
-| **Supabase** | Database + Auth | All Templates | ✅ Europe/Zurich |
-| **Sentry** | Error Tracking | All Templates | ✅ GDPR Compliant |
-| **Pino** | Logging | All Templates | ✅ Structured Logs |
+| Service | Purpose | Business Model Support | Swiss Optimization |
+|---------|---------|------------------------|-------------------|
+| **Stripe** | Payments | All (configurable) | ✅ CHF + TWINT |
+| **Resend** | Email | All | ✅ German Templates |
+| **Supabase** | Database + Auth | All | ✅ Europe/Zurich |
+| **Sentry** | Error Tracking | All | ✅ GDPR Compliant |
+| **Pino** | Logging | All | ✅ Structured Logs |
 
-### Template-Service Matrix
+### Business Model → Service Configuration
 ```typescript
-// Business Model → Active Services
+// Environment-basierte Service-Aktivierung
 saas:    Stripe (subscriptions), Resend (billing), Sentry, Analytics
 shop:    Stripe (payments), Resend (orders), Sentry, Analytics  
 booking: Stripe (appointments), Resend (confirmations), Sentry, Analytics
@@ -45,7 +45,7 @@ STRIPE_WEBHOOK_SECRET=whsec_...
 
 ### Business Model Integration
 
-**SaaS Template:**
+**SaaS Configuration:**
 ```typescript
 // Subscription Pricing (CHF)
 STRIPE_STARTER_PRICE_ID=price_1ABC_starter_chf_monthly
@@ -57,7 +57,7 @@ customer.subscription.created|updated|deleted
 payment_intent.succeeded|payment_failed
 ```
 
-**Shop Template:**
+**Shop Configuration:**
 ```typescript
 // Dynamic Product Pricing
 currency: 'CHF'
@@ -67,7 +67,7 @@ shipping_address_collection: {
 }
 ```
 
-**Booking Template:**
+**Booking Configuration:**
 ```typescript
 // Time-based Pricing with Swiss Business Hours
 peakHours: ['09:00-12:00', '14:00-18:00']
@@ -135,7 +135,7 @@ const germanDate = new Intl.DateTimeFormat('de-CH', {
 }).format(new Date(paymentDate));
 ```
 
-### Template-spezifische Workflows
+### Business Model Email Workflows
 
 **SaaS Emails:**
 - Welcome: Subscription onboarding
@@ -165,7 +165,7 @@ npm run email:dev  # React Email Preview
 
 ## ⚙️ Environment Configuration
 
-**Multi-Template Configuration mit Feature Flags**
+**Universal Template mit Business Model Detection**
 
 ### Core Environment Setup
 ```env
@@ -216,7 +216,7 @@ RESEND_API_KEY=re_live_...     # Live email delivery
 ```bash
 # Automatische Environment-Konfiguration
 ./create-project.sh kunde-app saas
-# → Erstellt .env.local mit SaaS-spezifischen Einstellungen
+# → Erstellt .env.local mit konfigurierten Feature Flags
 # → ENABLE_SUBSCRIPTIONS=true, andere Features=false
 ```
 
@@ -370,7 +370,7 @@ ZodError: Required environment variable missing: STRIPE_SECRET_KEY
 ```bash
 # Check feature flags
 echo $BUSINESS_MODEL $ENABLE_SUBSCRIPTIONS
-# Verify template-specific configuration
+# Verify template configuration
 ```
 
 ### Service Connectivity
@@ -414,4 +414,4 @@ docker compose restart kong
 
 **Integration Status**: Production-Ready ✅ | Swiss-Optimized 🇨🇭  
 **Next Steps**: [Development Guide](05-development.md) | [Customization](06-customization.md)  
-**Version**: NextJS Starter Kit v2.0
+**Version**: NextJS Starter Kit v3.0 - Simplified Edition

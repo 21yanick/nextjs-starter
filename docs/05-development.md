@@ -1,6 +1,6 @@
 # 💻 Development Workflow
 
-**Essential commands für tägliche Entwicklung mit Next.js 15 + Turbopack**
+**Simplified development für Next.js 15 + Turbopack mit Single-Template-Architektur**
 
 ---
 
@@ -11,12 +11,9 @@
 # 1. Infrastructure starten
 cd infrastructure && docker compose up -d
 
-# 2. Development-Template wählen und setup
-cd ../templates/nextjs-saas-dev
-pnpm install && pnpm run db:setup
-
-# 3. Development starten  
-pnpm run dev
+# 2. Template-Entwicklung starten
+cd ../template/
+pnpm install && pnpm run db:setup && pnpm run dev
 ```
 
 ### Kundenprojekt-Entwicklung
@@ -60,55 +57,34 @@ npm run db:seed      # Test data
 
 ---
 
-## 🛠️ Template-Development
+## 🛠️ Simplified Development Architecture
 
-### Template-Manager Commands
+### Single-Template-Entwicklung
+**Keine komplexen Sync-Mechanismen mehr!**
+
 ```bash
-# Status anzeigen
-scripts/template-manager.sh status
-
-# Development-Templates erstellen
-scripts/template-manager.sh create-dev
-
-# Nach Entwicklung: Sync zurück zu Production
-scripts/template-manager.sh sync saas
-
-# Alle Templates validieren
-scripts/template-manager.sh validate
-```
-
-### Template-Development-Workflow
-```bash
-# 1. Development-Template erstellen (einmalig)
-scripts/template-manager.sh create-dev
-
-# 2. Daily Development
-cd templates/nextjs-saas-dev/
+# Template-Verbesserung (Starter-Kit-Development)
+cd template/
 pnpm install && pnpm run dev
-# → Entwickle Core-Changes (UI, Auth) + SaaS-Changes (Stripe, API)
-
-# 3. Intelligente Synchronisation
-scripts/template-manager.sh sync saas
-# → Core-Changes automatisch zu nextjs-core/
-# → SaaS-Changes automatisch zu nextjs-saas-template/
-# → Alle Dev-Templates werden regeneriert
+# → Direkte Entwicklung im Production-Template
+# → Alle künftigen Projekte profitieren automatisch
+# → Keine Sync-Scripts oder Merge-Konflikte
 ```
 
-### Template-Intelligence
-- **Core-Detection**: `components/ui/`, `lib/supabase/`, `components/auth/` → Shared
-- **SaaS-Detection**: `lib/stripe/`, `app/api/checkout/`, SaaS-components → Business-specific
-- **Auto-Sync**: Script erkennt automatisch Ziel-Template
-- **Complete-Regeneration**: Alle Templates bleiben konsistent
+### Workflow-Vorteile
+- ✅ **Direkte Entwicklung**: Template-Verbesserungen direkt im `template/` Directory
+- ✅ **Sofortige Verfügbarkeit**: Neue Features automatisch in allen künftigen Projekten
+- ✅ **Keine Sync-Komplexität**: Keine template-manager Scripts oder merge conflicts
+- ✅ **Ein Source of Truth**: Template ist gleichzeitig Development- und Production-Version
 
-### Template-Struktur
-```bash
-templates/
-├── nextjs-core/              # Shared (UI, Auth, Layout)
-├── nextjs-saas-template/     # SaaS-specific (Stripe, API)
-├── nextjs-saas-dev/          # Development (Core + SaaS merged)
-├── nextjs-shop-dev/          # Development (Core + Shop merged)
-└── nextjs-booking-dev/       # Development (Core + Booking merged)
-```
+### Template vs Client Project Development
+
+| **Template Development** | **Client Project Development** |
+|--------------------------|--------------------------------|
+| `cd template/` | `cd clients/projekt-name/` |
+| Verbesserung des Starter Kits | Kundenspezifische Entwicklung |
+| Alle künftigen Projekte profitieren | Isolierte Projekt-Entwicklung |
+| Generische Features | Business-spezifische Features |
 
 ---
 
@@ -161,6 +137,42 @@ npm run db:seed      # Fresh test data
 ### Direct Database Access
 ```bash
 docker exec -it supabase-db psql -U postgres -d postgres
+```
+
+---
+
+## 🎯 Business Model Development
+
+### Environment-Based Features
+Template unterstützt alle Business Models durch Feature Flags:
+
+```bash
+# SaaS Development
+cd template/
+echo "BUSINESS_MODEL=saas" >> .env.local
+echo "ENABLE_SUBSCRIPTIONS=true" >> .env.local
+pnpm run dev
+
+# E-Commerce Development  
+echo "BUSINESS_MODEL=shop" >> .env.local
+echo "ENABLE_SHOP=true" >> .env.local
+pnpm run dev
+
+# Booking Development
+echo "BUSINESS_MODEL=booking" >> .env.local
+echo "ENABLE_BOOKINGS=true" >> .env.local
+pnpm run dev
+```
+
+### Feature-Flag-basierte Entwicklung
+```typescript
+// In Template-Code
+import { features } from '@/lib/features'
+
+// Conditional rendering basierend auf Business Model
+{features.subscriptions && <SubscriptionButton />}
+{features.shop && <ShoppingCart />}
+{features.bookings && <BookingCalendar />}
 ```
 
 ---
@@ -268,11 +280,22 @@ npm audit && npm audit fix
 
 ## 🔄 Git Workflow
 
-### Commit Process
+### Template Development
 ```bash
+# Template improvements
+cd template/
 git add .
-git commit -m "feat: add feature"  # Conventional commits
-# → Auto-triggers: format + lint + type-check
+git commit -m "feat: add new feature to template"
+# → Alle künftigen Projekte profitieren automatisch
+```
+
+### Client Project Development
+```bash
+# Client-specific changes
+cd clients/kunde-projekt/
+git add .
+git commit -m "feat: add kunde-specific feature"
+# → Isolierte Projekt-Entwicklung
 ```
 
 ### Branch Development
@@ -285,12 +308,42 @@ git commit -m "feat: implement new feature"
 
 ---
 
+## 🎨 Template Customization Patterns
+
+### Neue Feature im Template hinzufügen
+```bash
+# 1. Feature-Development im Template
+cd template/
+# 2. Feature-Flag hinzufügen (optional)
+echo "ENABLE_NEW_FEATURE=true" >> .env.example
+# 3. Feature implementieren
+# 4. Testen mit verschiedenen Business Models
+# 5. Commit → Alle künftigen Projekte haben das Feature
+```
+
+### Business-Model-spezifische Features
+```typescript
+// lib/features.ts erweitern
+export const features = {
+  subscriptions: process.env.ENABLE_SUBSCRIPTIONS === 'true',
+  shop: process.env.ENABLE_SHOP === 'true',
+  bookings: process.env.ENABLE_BOOKINGS === 'true',
+  newFeature: process.env.ENABLE_NEW_FEATURE === 'true'
+}
+
+// Conditional rendering
+{features.newFeature && <NewFeatureComponent />}
+```
+
+---
+
 ## ⚡ Performance Tips
 
 ### Development Speed
 - **Turbopack**: Enabled by default (`--turbopack`)
 - **Incremental TypeScript**: Faster type checking
 - **Docker**: Keep services running between sessions
+- **Hot Reload**: Instant feedback on changes
 
 ### Build Optimization
 ```bash
@@ -326,6 +379,56 @@ npm run dev
 
 ---
 
-**Development Status**: Next.js 15 + Turbopack ⚡  
-**Quality Tools**: ESLint + Prettier + TypeScript + Husky ✅  
-**Infrastructure**: Docker + Supabase + Swiss-optimized 🇨🇭
+## 🎯 Development Workflows
+
+### Scenario 1: Template-Feature hinzufügen
+```bash
+# Neue Authentication-Feature für alle Projekte
+cd template/
+# → Feature entwickeln
+# → Testen mit allen Business Models
+# → Commit
+# Resultat: Alle künftigen Projekte haben das Feature
+```
+
+### Scenario 2: Kundenprojekt-spezifische Entwicklung
+```bash
+# Kunde-spezifisches Dashboard
+cd clients/kunde-portal/
+# → Kundenspezifische Features entwickeln
+# → Normale Projekt-Entwicklung
+# → Template bleibt unverändert
+```
+
+### Scenario 3: Business-Model-Feature
+```bash
+# Neue Shop-Feature für E-Commerce
+cd template/
+# → Feature mit Feature-Flag entwickeln
+# → In shop-spezifischen Bereichen implementieren
+# → Testen mit ENABLE_SHOP=true
+# Resultat: Alle Shop-Projekte profitieren
+```
+
+---
+
+## 🏗️ Simplified Architecture Benefits
+
+### ✅ Development Benefits
+- **No Sync Complexity**: Direkte Entwicklung ohne merge conflicts
+- **Immediate Availability**: Features sofort in allen künftigen Projekten
+- **Single Source of Truth**: Template ist einzige Quelle der Wahrheit
+- **Clear Separation**: Template vs Client Project Development
+
+### ✅ Maintenance Benefits
+- **Easy Updates**: Template-Verbesserungen an einer Stelle
+- **Consistent Quality**: Alle Projekte verwenden bewährte Template-Version
+- **Reduced Complexity**: Keine script-basierten Sync-Mechanismen
+- **Fast Development**: Sofort produktionsfähige Projekte
+
+---
+
+**Development Status**: Simplified Single-Template Architecture ✅  
+**Quality Tools**: ESLint + Prettier + TypeScript + Husky ⚡  
+**Infrastructure**: Docker + Supabase + Swiss-optimized 🇨🇭  
+**Version**: NextJS Starter Kit v3.0 - Simplified Edition

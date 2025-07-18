@@ -16,7 +16,6 @@ docker --version && node --version && git --version
 
 ## 🏗️ Setup (3 Steps)
 
-### Kundenprojekt-Entwicklung
 ### 1. Infrastructure (2 min)
 ```bash
 git clone [repo-url] nextjs-starter
@@ -40,7 +39,9 @@ pnpm install && pnpm run db:setup && pnpm run dev
 
 ---
 
-## 🛠️ Template-Entwicklung (Starter-Kit-Verbesserung)
+## 🛠️ Template Development
+
+**Template verbessern (für alle künftigen Projekte):**
 
 ### 1. Infrastructure (2 min)
 ```bash
@@ -49,15 +50,9 @@ cd nextjs-starter/infrastructure
 docker compose up -d
 ```
 
-### 2. Development-Template (1 min)
+### 2. Template Development (2 min)
 ```bash
-cd ..
-scripts/template-manager.sh create-dev
-```
-
-### 3. Template-Development (2 min)
-```bash
-cd templates/nextjs-saas-dev/
+cd ../template/
 pnpm install && pnpm run db:setup && pnpm run dev
 ```
 
@@ -65,24 +60,22 @@ pnpm install && pnpm run db:setup && pnpm run dev
 
 ---
 
-## 🎯 Template Selection
+## 🎯 Business Model Configuration
 
-| Template | Status | Empfehlung |
-|----------|--------|------------|
-| **🟢 SaaS** | 90% ✅ | **Production Ready** |
-| **🟡 Shop** | 45% 🚧 | Development Only |
-| **🔴 Booking** | 25% 🔴 | Concept Only |
-
-**⚠️ Wichtig:** Nur SaaS Template für produktive Projekte verwenden!
+**Ein Template, alle Business Models:**
 
 ```bash
-# Empfohlen für Production
+# SaaS (Standard)
 ./create-project.sh kunde-portal saas
 
-# Nur für Entwicklung
-./create-project.sh test-shop shop
-./create-project.sh test-booking booking
+# E-Commerce
+./create-project.sh online-shop shop
+
+# Booking System
+./create-project.sh beauty-salon booking
 ```
+
+**Konfiguration erfolgt automatisch via Environment-Variablen** - maximale Flexibilität bei minimaler Komplexität.
 
 ---
 
@@ -106,18 +99,14 @@ Password: password123
 
 **Verstehe das System:**
 - [System Architecture](02-system.md) - Wie alles funktioniert
-- [Template Details](03-templates.md) - Business Model Features + Template-Development
+- [Universal Template](03-templates.md) - Ein Template für alle Business Models
 
 **Start Development:**
-- [Development Workflow](05-development.md) - Daily commands + Template-Development
+- [Development Workflow](05-development.md) - Daily commands + Template Development
 - [Service Integrations](04-integrations.md) - Stripe, Email setup
 
 **Customize for Client:**
 - [Customization Guide](06-customization.md) - Branding & Production
-
-**Template-Development:**
-- [Template Management](03-templates.md#template-management) - Scripts und Workflow
-- [Development Templates](05-development.md#template-development) - Dual-Purpose-Architektur
 
 ---
 
@@ -129,7 +118,6 @@ Password: password123
 | Docker läuft nicht | Docker Desktop starten |
 | Services starten nicht | `docker compose restart` |
 | Build Fehler | `rm -rf .next && npm run dev` |
-| Template funktioniert nicht | SaaS Template verwenden |
 
 ### Emergency Reset
 ```bash
@@ -149,13 +137,6 @@ npm run format       # Code formatting
 npm run type-check   # TypeScript validation
 ```
 
-### Production Ready?
-```bash
-# SaaS Template: ✅ Sofort einsatzbereit
-# Shop Template: 🚧 Viele Features fehlen noch
-# Booking Template: 🔴 Proof-of-concept nur
-```
-
 ### Swiss Features
 - 🇨🇭 CHF currency support
 - 🔄 TWINT payments
@@ -164,5 +145,5 @@ npm run type-check   # TypeScript validation
 
 ---
 
-**Setup Zeit:** ~15 Minuten | **Production Ready:** SaaS Template only ⚡  
+**Setup Zeit:** ~15 Minuten | **Production Ready:** ✅  
 **Tech Stack:** Next.js 15 + React 19 + TypeScript + Supabase + Docker 🚀

@@ -31,11 +31,12 @@ print_error() {
 }
 
 # Check arguments
-if [ $# -lt 2 ]; then
-    print_error "Usage: $0 <client-name> <business-model>"
-    echo "Business models: saas, shop, booking"
+if [ $# -lt 1 ]; then
+    print_error "Usage: $0 <client-name> [business-model]"
+    echo "Business models: saas (default), shop, booking"
     echo ""
     echo "Examples:"
+    echo "  $0 kunde-crm"
     echo "  $0 kunde-crm saas"
     echo "  $0 beauty-salon booking"
     echo "  $0 online-shop shop"
@@ -43,7 +44,7 @@ if [ $# -lt 2 ]; then
 fi
 
 CLIENT_NAME=$1
-BUSINESS_MODEL=$2
+BUSINESS_MODEL=${2:-saas}  # Default to saas if not provided
 
 # Validate business model
 if [[ ! "$BUSINESS_MODEL" =~ ^(saas|shop|booking)$ ]]; then
@@ -60,18 +61,12 @@ if [[ ! "$CLIENT_NAME" =~ ^[a-zA-Z0-9_-]+$ ]]; then
 fi
 
 # Directory paths
-TEMPLATE_DIR="templates/nextjs-${BUSINESS_MODEL}-template"
-CORE_DIR="templates/nextjs-core"
+TEMPLATE_DIR="template"
 TARGET_DIR="../clients/${CLIENT_NAME}"
 
 # Check if template exists
 if [ ! -d "$TEMPLATE_DIR" ]; then
     print_error "Template not found: $TEMPLATE_DIR"
-    exit 1
-fi
-
-if [ ! -d "$CORE_DIR" ]; then
-    print_error "Core foundation not found: $CORE_DIR"
     exit 1
 fi
 
@@ -94,15 +89,9 @@ mkdir -p "$TARGET_DIR"
 print_status "🚀 Creating professional ${BUSINESS_MODEL} project for ${CLIENT_NAME}"
 print_status "📂 Target: ${TARGET_DIR}"
 
-# Copy core foundation
-print_status "📋 Copying core foundation..."
-cp -r "$CORE_DIR/." "$TARGET_DIR/"
-
-# Copy business model specific template
-print_status "🎯 Adding ${BUSINESS_MODEL} specific features..."
-if [ -d "$TEMPLATE_DIR" ]; then
-    cp -rf "$TEMPLATE_DIR/." "$TARGET_DIR/"
-fi
+# Copy universal template
+print_status "📋 Copying NextJS template..."
+cp -r "$TEMPLATE_DIR/." "$TARGET_DIR/"
 
 # Customize package.json
 print_status "📦 Customizing package.json for ${CLIENT_NAME}..."

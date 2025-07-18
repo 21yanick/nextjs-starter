@@ -1,6 +1,6 @@
 # 🎯 Project Customization
 
-**Template → Client transformation workflows für Agencies und Entwickler**
+**Template → Client transformation für professionelle Projekte**
 
 ---
 
@@ -14,11 +14,11 @@ npm install
 ```
 
 ### Was passiert automatisch
-- Core Foundation kopiert
-- Business Template overlay angewendet
+- Universal template kopiert
 - Environment Variables konfiguriert
 - Package.json mit Client-Namen angepasst
 - README.md für Client generiert
+- Business Model Feature Flags gesetzt
 
 ---
 
@@ -142,9 +142,9 @@ export async function POST(request: Request) {
 
 ---
 
-## 🎯 Template-spezifische Customization
+## 🎯 Business Model Customization
 
-### SaaS Template
+### SaaS Configuration
 ```typescript
 // Subscription Plans anpassen
 const plans = [
@@ -157,7 +157,7 @@ const plans = [
 // app/dashboard/page.tsx - User-spezifische Metrics
 ```
 
-### Shop Template
+### Shop Configuration
 ```typescript
 // Product Categories
 const categories = ['Category1', 'Category2', 'Custom']
@@ -166,7 +166,7 @@ const categories = ['Category1', 'Category2', 'Custom']
 const paymentMethods = ['card', 'twint'] // Regional anpassen
 ```
 
-### Booking Template
+### Booking Configuration
 ```typescript
 // Services definieren
 const services = [
@@ -226,11 +226,11 @@ trackEvent('client_conversion', {
 git branch backup-customizations
 
 # 2. Neue Template Version holen  
-cd ../../templates/nextjs-saas-template
+cd ../../template/
 git pull origin main
 
 # 3. Selective Updates anwenden
-# Manual merge von Core-Updates mit Client-Customizations
+# Manual merge von Template-Updates mit Client-Customizations
 ```
 
 ### Client-spezifische Changes bewahren
@@ -319,4 +319,4 @@ production            # Deployed version
 
 **Customization Status**: Template → Client Ready ✅  
 **Next Steps**: [Development Guide](05-development.md) | [Quick Start](01-quickstart.md)  
-**Version**: NextJS Starter Kit v2.0
+**Version**: NextJS Starter Kit v3.0 - Simplified Edition

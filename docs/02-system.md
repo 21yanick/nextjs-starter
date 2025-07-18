@@ -1,8 +1,8 @@
 # 🔧 System Architecture
 
-**Self-hosted Supabase infrastructure mit multi-template business model system**
+**Self-hosted Supabase infrastructure mit universal template system**
 
-Dieses Starter Kit verwendet eine selbst-gehostete Supabase-Infrastruktur mit einem intelligenten Template-System für verschiedene Business Models (SaaS, E-Commerce, Booking). Das System generiert spezialisierte Projekte ohne unnötigen Code-Ballast.
+Dieses Starter Kit verwendet eine selbst-gehostete Supabase-Infrastruktur mit einem universellen Template für alle Business Models (SaaS, E-Commerce, Booking). Das System generiert spezialisierte Projekte über Environment-Konfiguration ohne unnötigen Code-Ballast.
 
 > **📖 Setup-Anweisungen**: Siehe [infrastructure/README.md](../infrastructure/README.md)
 
@@ -28,36 +28,40 @@ Dieses Starter Kit verwendet eine selbst-gehostete Supabase-Infrastruktur mit ei
 - **PostgreSQL**: Business-Schema + 16 Supabase Auth-Tabellen
 - **Supabase Studio**: Database-Management Interface
 
-### Template Generation
+### Template System
+- **Universal Template**: Ein Template für alle Business Models
+- **Environment-Konfiguration**: Business Model via Feature Flags
 - **Project Generator**: `./create-project.sh name model`
-- **Core Foundation**: Shared components + authentication
-- **Business Overlays**: Model-spezifische Features
-- **Feature Flags**: Runtime business model detection
+- **Direct Copy**: Einfache Template → Client Projekterstellung
 
 ---
 
-## 📋 Template System Architecture
+## 📋 Simplified Template Architecture
 
-### Core Foundation (`nextjs-core/`)
-**Shared basis für alle business models:**
+### Universal Template (`template/`)
+**Ein Template mit allen Features:**
 - Authentication (Supabase Auth integration)
 - UI Components (Radix + Tailwind)
 - Layout System (Header, Footer, Navigation)
 - Theme Support (Dark/Light mode)
 - Email Templates (Welcome, notifications)
+- Stripe Integration (Subscriptions, Payments, Webhooks)
+- Swiss Optimization (CHF, TWINT, de-CH)
 
-### Business Model Templates
-| Template | Focus | Key Features |
-|----------|-------|--------------|
-| **SaaS** | Subscriptions | Stripe subscriptions, user dashboard, billing |
-| **Shop** | E-Commerce | Product catalog, shopping cart, checkout |
-| **Booking** | Appointments | Calendar system, service management, deposits |
+### Business Model Support
+| Feature | SaaS | Shop | Booking |
+|---------|------|------|---------|
+| **Authentication** | ✅ | ✅ | ✅ |
+| **Subscriptions** | ✅ | ❌ | ❌ |
+| **E-Commerce** | ❌ | ✅ | ❌ |
+| **Appointments** | ❌ | ❌ | ✅ |
+| **Swiss Features** | ✅ | ✅ | ✅ |
 
 ### Generation Process
-1. **Copy Core**: `nextjs-core/` → `clients/project-name/`
-2. **Apply Template**: `nextjs-{model}-template/` → overwrites specific files
-3. **Configure**: Update `package.json`, `.env.local`, feature flags
-4. **Sync Keys**: Ensure JWT keys match infrastructure
+1. **Copy Template**: `template/` → `clients/project-name/`
+2. **Configure Environment**: Business model + feature flags in `.env.local`
+3. **Update Metadata**: `package.json`, README, client-specific settings
+4. **Ready to develop**: Sofort produktionsfähig
 
 ---
 
@@ -164,11 +168,11 @@ SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsI...
 
 ## 🚀 Architecture Benefits
 
-### Template Advantages
-- **Zero Code Ballast**: Only necessary code per business model
+### Simplified Template Benefits
+- **No Code Ballast**: Feature flags aktivieren nur benötigte Features
 - **Rapid Deployment**: 15-minute project generation
-- **Consistent Structure**: Standardized project layout
-- **Easy Customization**: Clear separation of concerns
+- **Single Source of Truth**: Ein Template für alle Projekte
+- **Easy Maintenance**: Updates an einer Stelle
 
 ### Self-Hosting Benefits
 - **Full Control**: No vendor lock-in or usage limits
@@ -208,4 +212,4 @@ SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsI...
 
 **Architecture Status**: Production-Ready ✅  
 **Setup Guide**: [infrastructure/README.md](../infrastructure/README.md)  
-**Version**: NextJS Starter Kit v2.0
+**Version**: NextJS Starter Kit v3.0 - Simplified Edition

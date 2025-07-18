@@ -1,349 +1,287 @@
-# 🎨 Business Templates
+# 🎨 NextJS Template
 
-**Spezialisierte Templates für verschiedene Business Models mit unterschiedlichen Reifegraden**
+**Ein universelles Swiss NextJS Template für alle Business Models**
 
-Das Starter Kit bietet 3 Business Templates, die auf einer gemeinsamen Core Foundation aufbauen. **Wichtig**: Die Templates haben unterschiedliche Entwicklungsstände - wähle basierend auf deinen Produktionsanforderungen.
-
----
-
-## 📊 Template-Reifegrad Übersicht
-
-| Template | Reifegrad | Status | Produktionsbereit | Empfehlung |
-|----------|-----------|---------|-------------------|------------|
-| **🟢 SaaS** | 90% | Production-Ready | ✅ Ja | Hauptempfehlung |
-| **🟡 Shop** | 45% | In Development | ❌ Nein | Nur für Entwickler |
-| **🔴 Booking** | 25% | Early Preview | ❌ Nein | Concept-Only |
-
-> **💡 Empfehlung**: Starte mit dem **SaaS Template** für produktive Projekte. Shop und Booking sind für experimentelle Entwicklung.
+Das Starter Kit bietet **eine einzige, vollständige Template** die für verschiedene Business Models konfigurierbar ist. Schluss mit komplexen Multi-Template-Systemen – maximale Einfachheit bei vollständiger Funktionalität.
 
 ---
 
-## 🏗️ Dual-Purpose-Architektur
+## 🎯 Template-Philosophie
 
-**Saubere Trennung zwischen Development und Production:**
+**Ein Template, alle Möglichkeiten:**
+- ✅ **Production-Ready**: Vollständig funktionsfähige Swiss Web-App
+- ✅ **Universal**: Unterstützt SaaS, E-Commerce, Booking via Environment-Variablen
+- ✅ **Swiss-Optimiert**: CHF, de-CH, TWINT, 7.7% MwSt
+- ✅ **Modern Stack**: Next.js 15, React 19, TypeScript, Tailwind CSS
+- ✅ **Complete Auth**: Supabase Authentication mit User Management
+- ✅ **Stripe Integration**: Subscriptions, Payments, Webhooks
 
-### Core Foundation (nextjs-core)
-**Shared Basis für alle Templates:**
-- **Authentication**: Vollständige Supabase Auth Integration
-- **UI Components**: Radix UI + Tailwind CSS + Theme Support
-- **Layout System**: Header, Footer, Navigation (business-model-aware)
-- **Configuration**: Feature flags + environment-basierte Aktivierung
-- **Email System**: Resend integration + React Email templates
-- **Localization**: CHF currency, de-CH locale, TWINT payments
+---
 
-### Business Templates (nextjs-{model}-template)
-**Business-spezifische Teile:**
-- **SaaS**: `lib/stripe/subscription.ts`, `app/api/checkout/`, SaaS-specific components
-- **Shop**: `lib/stripe/shop.ts`, `app/api/products/`, Shop-specific components
-- **Booking**: `lib/stripe/booking.ts`, `app/api/appointments/`, Booking-specific components
+## 🏗️ Template-Struktur
 
-### Development Templates (nextjs-{model}-dev)
-**Merged Templates für Development:**
-- **Auto-generated**: Core + Business Template merged
-- **Ready-to-use**: `pnpm install && pnpm run dev`
-- **Sync-ready**: Änderungen zurück zu Core/Business Templates
-
-### Template Strategy
-```bash
-# Production (clean separation)
-nextjs-core/                    # Shared components only
-nextjs-saas-template/          # SaaS-specific only
-nextjs-shop-template/          # Shop-specific only
-
-# Development (merged for development)
-nextjs-saas-dev/               # Core + SaaS merged
-nextjs-shop-dev/               # Core + Shop merged
-nextjs-booking-dev/            # Core + Booking merged
+```
+template/                           # Ein universelles Template
+├── app/                           # Next.js 15 App Router
+│   ├── (auth)/                   # Authentication pages
+│   ├── (marketing)/              # Landing pages
+│   ├── dashboard/                # User dashboard
+│   └── api/                      # API routes
+├── components/                    # React components
+│   ├── ui/                       # Radix UI components
+│   ├── auth/                     # Authentication
+│   └── checkout/                 # Payment components
+├── lib/                          # Utilities
+│   ├── stripe/                   # Payment logic
+│   ├── supabase/                 # Database client
+│   └── utils.ts                  # Helper functions
+└── .env.example                  # Configuration template
 ```
 
 ---
 
-## 🟢 SaaS Template (Production-Ready)
+## ⚙️ Business Model Konfiguration
 
-**Subscription & Billing Management - 90% Vollständig**
+Das Template unterstützt alle Business Models durch **Environment-Variablen**:
 
-### ✅ Implementierte Features
-- **Stripe Subscriptions**: Create, cancel, resume, update subscriptions
-- **Payment Processing**: CHF subscriptions + TWINT support
-- **Webhook Integration**: Complete Stripe webhook handling
-- **Pricing System**: 3-tier pricing (Free, Pro, Enterprise)
-- **Database Schema**: Profiles + subscriptions tables
-- **Email Notifications**: Welcome emails + billing notifications
-
-### 🛠️ Business Logic
-```typescript
-// Subscription Management
-createSubscriptionCheckout(priceId, userId)  // ✅ Complete
-cancelSubscription(subscriptionId)          // ✅ Complete  
-updateSubscription(subscriptionId, newPlan) // ✅ Complete
-```
-
-### 📋 Setup & Configuration
+### SaaS Configuration
 ```env
-# SaaS-specific environment
 BUSINESS_MODEL=saas
 ENABLE_SUBSCRIPTIONS=true
 ENABLE_SHOP=false
 ENABLE_BOOKINGS=false
-
-# Stripe (CHF optimized)
-STRIPE_SECRET_KEY=sk_test_...
-STRIPE_WEBHOOK_SECRET=whsec_...
 ```
 
-### ⚠️ Was noch fehlt (10%)
-- **Subscription Dashboard**: User subscription management UI
-- **Usage Tracking**: Plan limits + feature restrictions
-- **Billing History**: Invoice downloads + payment history
-
-### 🚀 Template-Development
-```bash
-# Template-Entwicklung (empfohlen)
-cd templates/nextjs-saas-dev/
-pnpm install && pnpm run dev
-
-# Nach Entwicklung: Sync zurück zu Production-Templates
-scripts/sync-from-dev.sh saas
+### E-Commerce Configuration  
+```env
+BUSINESS_MODEL=shop
+ENABLE_SUBSCRIPTIONS=false
+ENABLE_SHOP=true
+ENABLE_BOOKINGS=false
 ```
 
-### 🚀 Kundenprojekt-Generierung
-```bash
-./create-project.sh mein-saas saas
-cd clients/mein-saas
-pnpm install && pnpm run dev
+### Booking Configuration
+```env
+BUSINESS_MODEL=booking
+ENABLE_SUBSCRIPTIONS=false
+ENABLE_SHOP=false
+ENABLE_BOOKINGS=true
 ```
 
 ---
 
-## 🟡 Shop Template (In Development)
+## 🚀 Projekt erstellen
 
-**E-Commerce & Product Sales - 45% Vollständig**
-
-> **⚠️ Development Warning**: Nicht für Produktionsnutzung. Kritische Features fehlen.
-
-### ✅ Was funktioniert
-- **Stripe Integration**: Basic shop payment logic
-- **Product Display**: Static product catalog UI (6 demo products)
-- **Business Configuration**: CHF pricing + Swiss localization
-- **Payment Methods**: Credit card + TWINT support
-
-### ❌ Kritische Lücken
-- **API Endpoints**: `/api/checkout` route fehlt komplett
-- **Database Schema**: Keine product/order tables
-- **Shopping Cart**: Kein cart state management
-- **Order Management**: Keine Bestellverwaltung
-- **Inventory System**: Keine Lagerverwaltung
-
-### 🛠️ Current State
-```typescript
-// Was implementiert ist
-lib/stripe/shop.ts     // ✅ Payment logic
-app/(marketing)/shop/  // ✅ Basic product display
-
-// Was fehlt
-app/api/checkout/      // ❌ Missing API endpoints
-app/dashboard/orders/  // ❌ No order management
-components/cart/       // ❌ No shopping cart
-```
-
-### 🔧 Für Entwickler
+### Syntax
 ```bash
-./create-project.sh mein-shop shop
-# Erwarte: Viel Eigenentwicklung nötig
-# Status: Proof-of-concept, nicht funktionsfähig
+./create-project.sh [projekt-name] [business-model]
 ```
 
----
-
-## 🔴 Booking Template (Early Preview)
-
-**Appointment Scheduling - 25% Vollständig**
-
-> **🔴 Preview Warning**: Nur für experimentelle Entwicklung. Grundlegende Features fehlen.
-
-### ✅ Was implementiert ist
-- **Stripe Booking Logic**: Sophisticated appointment payment system
-- **Time-based Pricing**: Peak hours, weekend multipliers
-- **Service Management**: Categories (Beauty, Health, Professional)
-- **Payment Processing**: Deposits + full payments
-- **Swiss Configuration**: CHF + Europe/Zurich timezone
-
-### ❌ Fundamentale Lücken
-- **Database Schema**: Keine appointment/service tables
-- **Calendar System**: Kein date/time picker
-- **API Endpoints**: Keine booking routes
-- **Availability Management**: Keine timeslot logic
-- **Booking Flow**: Kein reservation interface
-- **Provider Dashboard**: Keine appointment management
-
-### 🛠️ Development State
-```typescript
-// Hochwertige Implementierung
-lib/stripe/booking.ts  // ✅ 80% - Excellent payment logic
-
-// Komplett fehlend  
-app/api/booking/       // ❌ No API layer
-app/calendar/          // ❌ No calendar interface
-components/scheduler/  // ❌ No booking UI
-```
-
-### 🧪 Für Entwickler
+### Beispiele
 ```bash
-./create-project.sh mein-booking booking
-# Erwarte: Massive Eigenentwicklung erforderlich
-# Status: Concept-only, nicht nutzbar
-```
-
----
-
-## 🎯 Template-Auswahl Guide
-
-### Für Produktive Projekte
-**→ SaaS Template wählen**
-- Vollständig funktionsfähig
-- Production-ready infrastructure
-- Minimal missing features (UI components)
-- Sofortige Deployment-Bereitschaft
-
-### Für Entwicklungsprojekte
-**→ Shop oder Booking nur für erfahrene Entwickler**
-- Erwarte erhebliche Eigenentwicklung
-- Nutze als Ausgangspunkt, nicht als Lösung
-- Budget für Backend + Frontend Development
-
-### Business Model Anpassung
-```typescript
-// Alle Templates teilen dieselbe Konfiguration
-BUSINESS_MODEL=saas|shop|booking
-
-// Feature-spezifische Aktivierung
-ENABLE_SUBSCRIPTIONS=true   // SaaS
-ENABLE_SHOP=true           // E-Commerce
-ENABLE_BOOKINGS=true       // Appointments
-```
-
----
-
-## 🛠️ Template-Management
-
-### Template-Manager-Scripts
-```bash
-# Template-Manager (zentrale Steuerung)
-scripts/template-manager.sh create-dev    # Development-Templates erstellen
-scripts/template-manager.sh sync saas     # SaaS-Template synchronisieren
-scripts/template-manager.sh validate      # Alle Templates validieren
-scripts/template-manager.sh status        # Template-Status anzeigen
-
-# Einzelne Scripts
-scripts/create-dev-templates.sh           # Dev-Templates generieren
-scripts/sync-from-dev.sh [template]       # Sync nach Development
-scripts/validate-templates.sh             # Template-Konsistenz prüfen
-```
-
-### Template-Development-Workflow
-```bash
-# 1. Development-Template erstellen (einmalig)
-scripts/template-manager.sh create-dev
-
-# 2. Template-Entwicklung (täglich)
-cd templates/nextjs-saas-dev/
-pnpm install && pnpm run dev
-# → Entwicklung: Core-Changes (UI, Auth) + SaaS-Changes (Stripe, API)
-
-# 3. Intelligente Synchronisation (nach Entwicklung)
-scripts/template-manager.sh sync saas
-# → Core-Changes → nextjs-core/ (alle Templates profitieren)
-# → SaaS-Changes → nextjs-saas-template/ (nur SaaS)
-# → Regeneriert alle Dev-Templates automatisch
-```
-
-### Sync-Intelligence
-- **Core-Files**: `components/ui/`, `lib/supabase/`, `components/auth/` → `nextjs-core/`
-- **SaaS-Files**: `lib/stripe/`, `app/api/checkout/`, `components/checkout-button.tsx` → `nextjs-saas-template/`
-- **Auto-Detection**: Script erkennt automatisch wo Files hingehören
-- **Complete Regeneration**: Alle Dev-Templates bleiben synchron
-
-### Template-Architektur-Vorteile
-- ✅ **Intelligente Sync**: Automatische Trennung Core vs Business-specific
-- ✅ **Vollständige Entwicklung**: Merged Templates mit allen Dependencies
-- ✅ **Production-Ready**: Saubere Trennung für create-project.sh
-- ✅ **Zero-Duplikation**: Shared components nur einmal in Core
-
----
-
-## ⚙️ Template Generation Process
-
-### Projekt erstellen
-```bash
-# Syntax
-./create-project.sh [projekt-name] [template]
-
-# Beispiele
+# SaaS Projekt (Standard)
 ./create-project.sh kunde-portal saas
+
+# E-Commerce Projekt
 ./create-project.sh online-shop shop
+
+# Booking Projekt  
 ./create-project.sh beauty-salon booking
+
+# Business Model ist optional (Standard: saas)
+./create-project.sh mein-projekt
 ```
-
-### Was passiert automatisch
-1. **Core Copy**: `nextjs-core/` → `clients/projekt-name/`
-2. **Template Overlay**: `nextjs-{template}-template/` → overwrites specific files
-3. **Configuration**: Update `package.json`, `.env.local`, feature flags
-4. **Infrastructure Sync**: JWT keys + database connection
-5. **Dependencies**: Install template-specific packages (Stripe, etc.)
-
-### Nach der Generierung
-```bash
-cd clients/projekt-name
-pnpm install
-pnpm run dev  # localhost:3000
-
-# Infrastructure muss laufen
-cd ../../infrastructure
-docker compose up -d
-```
-
-### Template-spezifische Dateien
-| File | Core | SaaS | Shop | Booking |
-|------|------|------|------|---------|
-| `lib/stripe/` | - | subscription.ts | shop.ts | booking.ts |
-| `app/api/checkout/` | - | ✅ Full | ❌ Missing | ❌ Missing |
-| `app/api/webhooks/` | - | ✅ Stripe | ❌ Missing | ❌ Missing |
-| `package.json` | Basic | +stripe | +stripe | +stripe |
 
 ---
 
-## 🚀 Empfehlungen
+## 🔧 Was passiert automatisch
+
+### 1. Template Copy
+```bash
+# Direkter Copy ohne komplexe Layering
+cp -r "template/." "clients/projekt-name/"
+```
+
+### 2. Automatische Konfiguration
+- **package.json**: Projekt-Name wird gesetzt
+- **.env.local**: Business Model Konfiguration
+- **DATABASE_URL**: Docker-Pooler-Connection
+- **Feature Flags**: Automatisch basierend auf Business Model
+
+### 3. Swiss Optimization
+- **Currency**: CHF (Rappen-basierte Berechnungen)
+- **Language**: German (de-CH)
+- **Payments**: Kreditkarte + TWINT
+- **Tax**: 7.7% MwSt automatisch eingerechnet
+- **Locale**: Schweizer Datum/Zahlen-Formatierung
+
+---
+
+## 💻 Development Workflow
 
 ### Template-Entwicklung (Starter-Kit-Verbesserung)
-**→ Development-Templates nutzen**
-- Entwicklung direkt in `templates/nextjs-saas-dev/`
-- Automatische Synchronisation zu Production-Templates
-- Saubere Trennung von Core und Business-Logic
-- Template-Manager für alle Operationen
+```bash
+# Direkt im Template entwickeln
+cd template/
+pnpm install && pnpm run dev
 
-### Sofortiger Kundenprojekt-Start
-**→ SaaS Template nutzen**
-- 15 Minuten bis funktionsfähige App
-- `./create-project.sh kunde-portal saas`
-- Subscription system ready
-- Nur UI customization nötig
+# → Keine Sync-Komplexität 
+# → Direkte Entwicklung in Production-Template
+# → Alle künftigen Projekte profitieren automatisch
+```
 
-### Development & Learning
-**→ SaaS als Basis, Shop/Booking als Referenz**
-- Verstehe SaaS implementation in Development-Template
-- Verwende Shop/Booking code patterns
-- Baue fehlende Features selbst
-- Nutze Template-Manager für Konsistenz
+### Kundenprojekt-Entwicklung
+```bash
+# 1. Projekt erstellen
+./create-project.sh kunde-crm saas
 
-### Enterprise/Agency Use
-**→ SaaS Template + Custom Extensions**
-- Starte mit SaaS foundation
-- Erweitere um business-spezifische Features
-- Nutze bewährte architecture patterns
-- Template-Development für wiederverwendbare Components
+# 2. Development starten
+cd clients/kunde-crm
+pnpm install && pnpm run dev
+
+# → Vollständige Isolation von Template
+# → Normale Projekt-Entwicklung
+```
 
 ---
 
-**Template Status**: SaaS Production-Ready ✅ | Shop/Booking In Development 🔧  
+## ✅ Template-Features
+
+### Vollständige Authentication
+- **Supabase Auth**: Email/Password + Social Login
+- **User Management**: Profile, Sessions, Security
+- **Protected Routes**: Dashboard, Admin-Bereiche
+- **Role-Based Access**: User/Admin-Rollen
+
+### Stripe Integration (CHF-optimiert)
+- **Subscriptions**: Create, Cancel, Resume, Update
+- **Payment Processing**: CHF-optimierte Preise
+- **Webhook Handling**: Vollständige Stripe-Event-Verarbeitung
+- **TWINT Support**: Swiss Payment Method
+
+### UI/UX Swiss Standard
+- **Radix UI**: Accessible components
+- **Tailwind CSS**: Swiss-optimierte Farben/Spacing
+- **Responsive Design**: Mobile-first approach
+- **Dark Mode**: Vollständige Theme-Unterstützung
+
+### Business Logic
+- **Dashboard**: User-spezifische Übersichten
+- **Subscription Management**: Self-service für Users
+- **Admin Interface**: Management-Tools
+- **Swiss Compliance**: MwSt, Datenschutz, Locale
+
+---
+
+## 🎨 Customization Guide
+
+### Branding anpassen
+```typescript
+// tailwind.config.ts
+colors: {
+  primary: {
+    50: '#f0f9ff',   // Brand-Farben anpassen
+    500: '#3b82f6',
+    900: '#1e3a8a'
+  }
+}
+```
+
+### Business-spezifische Features
+```typescript
+// lib/features.ts
+export const features = {
+  subscriptions: process.env.ENABLE_SUBSCRIPTIONS === 'true',
+  shop: process.env.ENABLE_SHOP === 'true', 
+  bookings: process.env.ENABLE_BOOKINGS === 'true'
+}
+```
+
+### Stripe Konfiguration
+```env
+# Swiss CHF Pricing
+STRIPE_SECRET_KEY=sk_...
+STRIPE_WEBHOOK_SECRET=whsec_...
+
+# CHF Price IDs (Stripe Dashboard)
+STRIPE_PRICE_STARTER=price_...
+STRIPE_PRICE_PRO=price_...
+```
+
+---
+
+## 📋 Next Steps
+
+### Nach Template-Generierung
+```bash
+cd clients/projekt-name
+
+# 1. Dependencies installieren
+pnpm install
+
+# 2. Database setup
+pnpm run db:setup
+
+# 3. Development starten
+pnpm run dev
+
+# ✅ Ready: http://localhost:3000
+```
+
+### Production Deployment
+1. **Environment**: Production `.env` konfigurieren
+2. **Database**: Supabase Cloud oder eigene PostgreSQL
+3. **Payments**: Stripe Live Keys konfigurieren
+4. **Domain**: Custom Domain + SSL
+5. **Monitoring**: Error tracking + Analytics
+
+---
+
+## 🛠️ Template-Maintenance
+
+### Template-Updates
+```bash
+# Template verbessern
+cd template/
+# → Entwicklung hier
+
+# Neue Projekte profitieren automatisch
+./create-project.sh neues-projekt saas
+# → Verwendet aktuellste Template-Version
+```
+
+### Bestehende Projekte aktualisieren
+```bash
+# Manuelle Updates in Client-Projekten
+cd clients/bestehendes-projekt
+# → Selective Updates von spezifischen Features
+# → Keine automatische Sync (vermeidet Konflikte)
+```
+
+---
+
+## 🎉 Vorteile der Single-Template-Architektur
+
+### ✅ Developer Experience
+- **Keine Sync-Komplexität**: Direkte Entwicklung im Template
+- **Klare Struktur**: Ein Template, eine Quelle der Wahrheit
+- **Einfache Wartung**: Updates nur an einer Stelle
+- **Schnelle Projekte**: 15 Minuten bis produktive App
+
+### ✅ Production Benefits
+- **Vollständig getestet**: Alle Features in einem Template
+- **Swiss-optimiert**: CHF, TWINT, de-CH, MwSt
+- **Modern Stack**: Next.js 15, React 19, TypeScript
+- **Security-First**: Supabase Auth + RLS + TypeScript
+
+### ✅ Business Value
+- **Schneller Time-to-Market**: Sofort produktionsfähig
+- **Konsistente Qualität**: Bewährte Patterns und Practices
+- **Skalierbare Architektur**: Enterprise-ready von Tag 1
+- **Swiss Compliance**: Automatisch rechtssicher
+
+---
+
+**Template Status**: Production-Ready ✅ | Universal Business Model Support 🎯  
 **Nächste Schritte**: [Integration Setup](04-integrations.md) | [Development Guide](05-development.md)  
-**Version**: NextJS Starter Kit v2.0
+**Version**: NextJS Starter Kit v3.0 - Simplified Edition
