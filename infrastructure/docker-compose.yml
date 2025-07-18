@@ -409,7 +409,12 @@ services:
       - ./volumes/db/pooler.sql:/docker-entrypoint-initdb.d/migrations/99-pooler.sql:Z
       # Use named volume to persist pgsodium decryption key between restarts
       - db-config:/etc/postgresql-custom
-      # Business schema for NextJS Core Template
+      # Business schema modules for NextJS Core Template (mounted for \i includes)
+      - ./volumes/db/00-core-schema.sql:/docker-entrypoint-initdb.d/00-core-schema.sql:Z
+      - ./volumes/db/01-saas-schema.sql:/docker-entrypoint-initdb.d/01-saas-schema.sql:Z
+      - ./volumes/db/02-shop-schema.sql:/docker-entrypoint-initdb.d/02-shop-schema.sql:Z
+      - ./volumes/db/03-booking-schema.sql:/docker-entrypoint-initdb.d/03-booking-schema.sql:Z
+      # Main schema loader (controls which modules are loaded)
       - ./volumes/db/business-schema.sql:/docker-entrypoint-initdb.d/migrations/99-business-schema.sql:Z
     healthcheck:
       test:
