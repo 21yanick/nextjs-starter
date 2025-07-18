@@ -1,97 +1,97 @@
-# 🚀 Quick Start Guide
+# 🚀 Schnellstart Anleitung
 
-**Get the NextJS starter template running in 5 minutes**
+**NextJS Starter Kit in 5 Minuten zum Laufen bringen**
 
-## ✅ Prerequisites
+## ✅ Voraussetzungen
 
-- Docker Desktop (running)
+- Docker Desktop (läuft)
 - Node.js 18+ 
-- pnpm or npm
-- Ports 3000, 55321-55323 available
+- pnpm oder npm
+- Ports 3000, 55321-55323 verfügbar
 
 ```bash
-# Verify setup
+# Setup überprüfen
 docker --version && node --version
 ```
 
-## 🏗️ Setup (2 Steps)
+## 🏗️ Setup (2 Schritte)
 
-### 1. Start Infrastructure (2 min)
+### 1. Infrastructure starten (2 min)
 ```bash
 git clone [repo-url] nextjs-starter
 cd nextjs-starter/infrastructure
 docker compose up -d
 ```
 
-Wait for all services to be healthy:
+Warten bis alle Services bereit sind:
 ```bash
 docker compose ps
-# All services should show "healthy" status
+# Alle Services sollten "healthy" Status zeigen
 ```
 
-### 2. Start Template Development (1 min)
+### 2. Template Development starten (1 min)
 ```bash
 cd ../template
 pnpm install
 pnpm run dev
 ```
 
-**✅ Ready:** [App](http://localhost:3000) | [Database](http://localhost:55323)
+**✅ Bereit:** [App](http://localhost:3000) | [Datenbank](http://localhost:55323)
 
-## 🔍 Verify Setup
+## 🔍 Setup Überprüfen
 
-### Quick Test Checklist
-- [ ] [App loads](http://localhost:3000) - Main application
-- [ ] [Studio works](http://localhost:55323) - Database interface  
-- [ ] Sign up creates account - Test authentication
-- [ ] Dashboard accessible - Protected routes work
+### Schnell-Test Checklist
+- [ ] [App lädt](http://localhost:3000) - Hauptanwendung
+- [ ] [Studio funktioniert](http://localhost:55323) - Datenbank Interface  
+- [ ] Registrierung erstellt Account - Authentication testen
+- [ ] Dashboard erreichbar - Geschützte Routen funktionieren
 
-### Test Account Creation
-1. Go to [Sign Up](http://localhost:3000/auth/register)
-2. Create account with any email/password
-3. Check [Supabase Studio](http://localhost:55323) → Authentication → Users
+### Test Account erstellen
+1. Gehe zu [Registrierung](http://localhost:3000/auth/register)
+2. Account mit beliebiger Email/Passwort erstellen
+3. Prüfen in [Supabase Studio](http://localhost:55323) → Authentication → Users
 
-## 🎯 What You Get
+## 🎯 Was Sie bekommen
 
 ### Template Features
-- **Authentication** - Complete signup/login system
-- **Database** - PostgreSQL with Supabase interface
-- **Payments** - Stripe integration (test mode)
-- **UI Components** - Radix UI with Tailwind CSS
-- **Theme** - Dark/light mode toggle
+- **Authentication** - Komplettes Signup/Login System
+- **Datenbank** - PostgreSQL mit Supabase Interface
+- **Payments** - Stripe Integration (Test Modus)
+- **UI Components** - Radix UI mit Tailwind CSS
+- **Theme** - Dark/Light Modus Wechsel
 
 ### Development Stack
 - **Frontend:** Next.js 15 + React 19 + TypeScript
-- **Backend:** Self-hosted Supabase stack
-- **Database:** PostgreSQL with migrations
+- **Backend:** Self-hosted Supabase Stack
+- **Datenbank:** PostgreSQL mit Migrations
 - **Styling:** Tailwind CSS + shadcn/ui
 
-## 🛠️ Daily Development
+## 🛠️ Tägliche Entwicklung
 
-### Common Commands
+### Wichtige Commands
 ```bash
 # Development
-pnpm run dev          # Start development server
-pnpm run build        # Test production build
-pnpm run lint         # Code linting
-pnpm run type-check   # TypeScript validation
+pnpm run dev          # Development Server starten
+pnpm run build        # Production Build testen
+pnpm run lint         # Code Linting
+pnpm run type-check   # TypeScript Validierung
 
 # Infrastructure  
 cd infrastructure/
-docker compose ps       # Check service status
-docker compose logs -f  # View logs
+docker compose ps       # Service Status prüfen
+docker compose logs -f  # Logs anzeigen
 ```
 
-## 🔧 Configuration
+## 🔧 Konfiguration
 
-### Customize Template
-Edit `lib/config.ts` to customize:
+### Template anpassen
+`lib/config.ts` bearbeiten:
 
 ```typescript
 export const siteConfig = {
-  name: "Your App Name",
-  currency: "USD" as const,  // Change from CHF
-  locale: "en-US" as const,  // Change from de-CH
+  name: "Ihr App Name",
+  currency: "EUR" as const,  // Von CHF ändern
+  locale: "de-DE" as const,  // Von de-CH ändern
   pricing: {
     starter: 9.99,
     pro: 19.99
@@ -99,15 +99,15 @@ export const siteConfig = {
 }
 ```
 
-### Environment Variables
-Key variables in `template/.env.local`:
+### Environment Variablen
+Wichtige Variablen in `template/.env.local`:
 
 ```env
-# Database (auto-configured)
+# Datenbank (automatisch konfiguriert)
 NEXT_PUBLIC_SUPABASE_URL=http://localhost:55321
 NEXT_PUBLIC_SUPABASE_ANON_KEY=...
 
-# Payments (add your test keys)
+# Payments (Ihre Test Keys hinzufügen)
 NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_...
 STRIPE_SECRET_KEY=sk_test_...
 STRIPE_STARTER_PRICE_ID=price_...
@@ -116,55 +116,55 @@ STRIPE_PRO_PRICE_ID=price_...
 
 ## 🐛 Troubleshooting
 
-### Common Issues
+### Häufige Probleme
 
-| Problem | Solution |
-|---------|----------|
-| Port 3000 in use | `lsof -i :3000` → kill process |
-| Docker services fail | Check Docker Desktop is running |
-| Build errors | `rm -rf .next && pnpm run dev` |
-| Database connection | `docker compose restart` |
+| Problem | Lösung |
+|---------|---------|
+| Port 3000 belegt | `lsof -i :3000` → Prozess beenden |
+| Docker Services fehlgeschlagen | Docker Desktop läuft prüfen |
+| Build Fehler | `rm -rf .next && pnpm run dev` |
+| Datenbank Verbindung | `docker compose restart` |
 
-### Infrastructure Issues
+### Infrastructure Probleme
 
-**Services won't start:**
+**Services starten nicht:**
 ```bash
-# Check available ports
+# Verfügbare Ports prüfen
 netstat -tulpn | grep :55321
 
-# Restart infrastructure
+# Infrastructure neustarten
 cd infrastructure/
 docker compose down && docker compose up -d
 ```
 
-**Database connection failed:**
+**Datenbank Verbindung fehlgeschlagen:**
 ```bash
-# Check service logs
+# Service Logs prüfen
 docker compose logs supabase-db
 docker compose logs kong
 
-# Test database
+# Datenbank testen
 docker exec supabase-db pg_isready -U postgres
 ```
 
-### Template Issues
+### Template Probleme
 
-**Authentication not working:**
-- Check Supabase Studio → Settings → API
-- Verify JWT keys match between infrastructure and template
-- Check browser console for errors
+**Authentication funktioniert nicht:**
+- Supabase Studio → Settings → API prüfen
+- JWT Keys zwischen Infrastructure und Template abgleichen
+- Browser Konsole auf Fehler prüfen
 
-**Build failures:**
+**Build Fehlschläge:**
 ```bash
-# Clear Next.js cache
+# Next.js Cache leeren
 rm -rf .next node_modules
 pnpm install
 pnpm run dev
 ```
 
-### Emergency Reset
+### Notfall Reset
 ```bash
-# Complete reset (nuclear option)
+# Kompletter Reset (Nuklear Option)
 cd infrastructure/
 docker compose down -v
 docker compose up -d
@@ -175,24 +175,24 @@ pnpm install
 pnpm run dev
 ```
 
-## 📚 Next Steps
+## 📚 Nächste Schritte
 
-### Learn the Stack
-- **[Development Guide](05-development.md)** - Daily workflow and best practices
-- **[Infrastructure Details](../infrastructure/README.md)** - Docker setup and services
+### Stack lernen
+- **[Development Guide](05-development.md)** - Täglicher Workflow und Best Practices
+- **[Infrastructure Details](../infrastructure/README.md)** - Docker Setup und Services
 
-### Customize Your App
-1. **Branding:** Update logo, colors, and content
-2. **Features:** Add your business logic
-3. **Database:** Extend schema in `infrastructure/volumes/db/`
-4. **Payments:** Configure Stripe with your products
+### App anpassen
+1. **Branding:** Logo, Farben und Inhalte aktualisieren
+2. **Features:** Ihre Business Logic hinzufügen
+3. **Datenbank:** Schema in `infrastructure/volumes/db/` erweitern
+4. **Payments:** Stripe mit Ihren Produkten konfigurieren
 
 ### Production Deployment
-1. Set up production database (managed PostgreSQL)
-2. Configure live Stripe keys and webhooks  
-3. Set up custom domain with SSL
-4. Configure monitoring and error tracking
+1. Production Datenbank einrichten (Managed PostgreSQL)
+2. Live Stripe Keys und Webhooks konfigurieren  
+3. Custom Domain mit SSL einrichten
+4. Monitoring und Error Tracking konfigurieren
 
 ---
 
-**Setup time:** ~5 minutes | **Status:** Production Ready ✅
+**Setup Zeit:** ~5 Minuten | **Status:** Production Ready ✅

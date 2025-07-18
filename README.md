@@ -1,85 +1,85 @@
 # NextJS Starter Kit
 
-**Production-ready NextJS template with authentication, payments, and database**
+**Production-Ready NextJS Template mit Authentication, Payments und Datenbank**
 
-Self-hosted stack with Supabase, Stripe integration, and modern development setup.
+Self-hosted Stack mit Supabase, Stripe Integration und modernem Development Setup.
 
-## 🚀 Quick Start
+## 🚀 Schnellstart
 
 ```bash
-# 1. Start infrastructure
+# 1. Infrastructure starten
 cd infrastructure && docker compose up -d
 
-# 2. Start development
+# 2. Development starten  
 cd ../template
 pnpm install && pnpm run dev
 ```
 
-**Ready:** [App](http://localhost:3000) | [Database](http://localhost:55323)
+**Bereit:** [App](http://localhost:3000) | [Datenbank](http://localhost:55323)
 
 ## 🛠️ Tech Stack
 
 **Frontend:** Next.js 15 • React 19 • TypeScript • Tailwind CSS  
 **Backend:** Supabase (self-hosted) • PostgreSQL • Docker  
-**Payments:** Stripe integration
+**Payments:** Stripe Integration  
 **Components:** Radix UI • shadcn/ui
 
 ## ✨ Features
 
-### Complete Authentication
-- Email/password signup and login
-- Protected routes and middleware
-- User profiles and session management
-- Password reset flow
+### Vollständige Authentication
+- Email/Passwort Registrierung und Login
+- Geschützte Routen und Middleware
+- Benutzerprofile und Session-Management
+- Passwort zurücksetzen Flow
 
 ### Payment Integration
-- Stripe checkout and subscriptions
-- Webhook handling for payment events
-- Subscription management dashboard
-- Invoice and billing history
+- Stripe Checkout und Subscriptions
+- Webhook Handling für Payment Events
+- Subscription Management Dashboard
+- Rechnungen und Billing History
 
-### Modern Development
-- Server-first architecture with client islands
-- TypeScript validation with Zod schemas
-- Dark/light theme with persistent state
-- Responsive design with Tailwind CSS
+### Moderne Entwicklung
+- Server-first Architektur mit Client Islands
+- TypeScript Validierung mit Zod Schemas
+- Dark/Light Theme mit persistentem State
+- Responsive Design mit Tailwind CSS
 
 ### Self-Hosted Infrastructure
-- PostgreSQL database with migrations
-- Supabase authentication and API
-- Docker Compose development stack
-- Database management interface
+- PostgreSQL Datenbank mit Migrations
+- Supabase Authentication und API
+- Docker Compose Development Stack
+- Database Management Interface
 
-## 📁 Project Structure
+## 📁 Projekt-Struktur
 
 ```
-template/                # Main development template
+template/                # Haupt-Development Template
 ├── app/                # Next.js 15 App Router
-├── components/         # React components
-├── lib/               # Utilities and integrations
-└── .env.local         # Environment configuration
+├── components/         # React Components
+├── lib/               # Utilities und Integrationen
+└── .env.local         # Environment Konfiguration
 
-infrastructure/         # Docker Compose stack
-├── docker-compose.yml # Service definitions
-├── volumes/           # Database initialization
-└── .env.local        # Infrastructure configuration
+infrastructure/         # Docker Compose Stack
+├── docker-compose.yml # Service Definitionen
+├── volumes/           # Database Initialisierung
+└── .env.local        # Infrastructure Konfiguration
 ```
 
-## 🔧 Configuration
+## 🔧 Konfiguration
 
-The template comes pre-configured with:
-- **Currency:** CHF (easily changeable in `lib/config.ts`)
-- **Locale:** German (de-CH) with Swiss formatting
-- **Payments:** Stripe with card and TWINT support
-- **Timezone:** Europe/Zurich
+Das Template kommt vorkonfiguriert mit:
+- **Währung:** CHF (einfach änderbar in `lib/config.ts`)
+- **Sprache:** Deutsch (de-CH) mit Schweizer Formatierung
+- **Payments:** Stripe mit Karte und TWINT Support
+- **Zeitzone:** Europe/Zurich
 
-Update `lib/config.ts` to customize for your region:
+`lib/config.ts` anpassen für Ihre Region:
 
 ```typescript
 export const siteConfig = {
-  name: "Your App Name",
-  currency: "USD" as const,
-  locale: "en-US" as const,
+  name: "Ihr App Name",
+  currency: "EUR" as const,
+  locale: "de-DE" as const,
   pricing: {
     starter: 9.99,
     pro: 19.99
@@ -89,38 +89,38 @@ export const siteConfig = {
 
 ## 🧪 Development
 
-### Daily Commands
+### Tägliche Commands
 ```bash
-pnpm run dev          # Development server
-pnpm run build        # Production build  
-pnpm run lint         # Code linting
-pnpm run type-check   # TypeScript validation
+pnpm run dev          # Development Server
+pnpm run build        # Production Build  
+pnpm run lint         # Code Linting
+pnpm run type-check   # TypeScript Validierung
 ```
 
 ### Infrastructure Management
 ```bash
 cd infrastructure/
-docker compose up -d      # Start services
-docker compose down       # Stop services  
-docker compose ps         # Service status
+docker compose up -d      # Services starten
+docker compose down       # Services stoppen  
+docker compose ps         # Service Status
 ```
 
-### Database
+### Datenbank
 - **Management:** [Supabase Studio](http://localhost:55323)
-- **Direct access:** `docker exec -it supabase-db psql -U postgres`
-- **Migrations:** SQL files in `infrastructure/volumes/db/`
+- **Direkter Zugriff:** `docker exec -it supabase-db psql -U postgres`
+- **Migrations:** SQL Dateien in `infrastructure/volumes/db/`
 
-## 📚 Documentation
+## 📚 Dokumentation
 
-- **[Quickstart](docs/01-quickstart.md)** - Complete setup guide
-- **[Development](docs/05-development.md)** - Development workflow
-- **[Infrastructure](infrastructure/README.md)** - Docker setup details
+- **[Schnellstart](docs/01-quickstart.md)** - Komplette Setup Anleitung
+- **[Development](docs/05-development.md)** - Development Workflow
+- **[Infrastructure](infrastructure/README.md)** - Docker Setup Details
 
 ## 🔑 Environment Setup
 
-### Template Configuration
+### Template Konfiguration
 ```env
-# Database
+# Datenbank
 NEXT_PUBLIC_SUPABASE_URL=http://localhost:55321
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
 SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
@@ -128,7 +128,6 @@ SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
 # Payments
 NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_...
 STRIPE_SECRET_KEY=sk_test_...
-STRIPE_WEBHOOK_SECRET=whsec_...
 STRIPE_STARTER_PRICE_ID=price_...
 STRIPE_PRO_PRICE_ID=price_...
 
@@ -136,9 +135,9 @@ STRIPE_PRO_PRICE_ID=price_...
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 ```
 
-### Infrastructure Configuration
+### Infrastructure Konfiguration
 ```env
-# Secrets (change for production)
+# Secrets (für Production ändern)
 POSTGRES_PASSWORD=your-secure-password
 JWT_SECRET=your-jwt-secret-32-chars-min
 ANON_KEY=your_anon_key
@@ -151,28 +150,14 @@ STUDIO_PORT=55323
 
 ## 🚀 Production Deployment
 
-1. **Environment:** Configure production `.env.local`
-2. **Database:** Set up managed PostgreSQL or self-host
-3. **Payments:** Configure Stripe live keys and webhooks
-4. **Domain:** Set up custom domain with SSL
-5. **Monitoring:** Configure error tracking and analytics
-
-## 🏗️ Architecture
-
-- **Server-first:** Optimized for server-side rendering and data fetching
-- **Component organization:** Grouped by domain (auth, billing, layout, theme)
-- **Type-safe:** Full TypeScript coverage with runtime validation
-- **Extensible:** Clean patterns for adding new features
-
-## 📊 Performance
-
-- **Bundle optimization:** Server components with minimal client JavaScript
-- **Database efficiency:** Optimized queries with connection pooling
-- **Caching:** Strategic caching at multiple levels
-- **Loading states:** Smooth UX with proper loading indicators
+1. **Environment:** Production `.env.local` konfigurieren
+2. **Datenbank:** Managed PostgreSQL oder Self-hosting
+3. **Payments:** Stripe Live Keys und Webhooks konfigurieren
+4. **Domain:** Custom Domain mit SSL einrichten
+5. **Monitoring:** Error Tracking und Analytics konfigurieren
 
 ---
 
 **Status:** Production Ready ✅  
-**License:** MIT  
-**Node.js:** 18+ required
+**Lizenz:** MIT  
+**Node.js:** 18+ erforderlich
