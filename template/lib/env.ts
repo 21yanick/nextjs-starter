@@ -20,13 +20,7 @@ const envSchema = z.object({
   // Database Direct Connection (for migrations)
   DATABASE_URL: z.string().optional(),
   
-  // Business Model Configuration (Swiss-only)
-  BUSINESS_MODEL: z.enum(['saas', 'shop', 'booking', 'universal']).default('universal'),
-  
-  // Feature Toggles
-  ENABLE_SUBSCRIPTIONS: z.string().default('true').transform(val => val === 'true'),
-  ENABLE_SHOP: z.string().default('true').transform(val => val === 'true'),
-  ENABLE_BOOKINGS: z.string().default('false').transform(val => val === 'true'),
+  // Swiss SaaS Template - no business model toggles needed
   
   // Additional Stripe Configuration
   STRIPE_ENTERPRISE_PRICE_ID: z.string().optional(),

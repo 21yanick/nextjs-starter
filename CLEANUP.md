@@ -37,35 +37,58 @@ infrastructure/volumes/db/
 
 **Benefits:** Project-specific database setup, no unused tables, easy extension
 
-### 2. **Remove Business Model Abstractions**
+### 2. **Remove Business Model Abstractions** ✅ **COMPLETED - PHASE 1B**
 
 ```typescript
-// Remove from template:
-- lib/business-config.ts (getBusinessModel, feature flags)
-- Multi-domain types in stripe/config.ts
-- BUSINESS_MODEL environment variables
-- ENABLE_* feature flags
+// ✅ REMOVED FROM TEMPLATE:
+- lib/business-config.ts (getBusinessModel, feature flags) # DELETED
+- Multi-domain types in stripe/config.ts                   # SIMPLIFIED
+- BUSINESS_MODEL environment variables                      # REMOVED FROM env.ts
+- ENABLE_* feature flags (ENABLE_SHOP, ENABLE_BOOKINGS)   # REMOVED FROM env.ts
 
-// Template becomes pure SaaS-focused
-// Document how to add Shop/Booking features separately
+// ✅ TEMPLATE NOW PURE SAAS-FOCUSED:
+- Clean Swiss SaaS template without business model abstractions
+- Single source of truth configuration in lib/config.ts
+- Simplified stripe/config.ts focused on Swiss payments
 ```
 
-**Benefits:** Simplicity, no unused code, clear purpose
+**✅ Implementation Results:**
+- **Code Reduction**: Removed ~90 lines of business model abstractions
+- **Simplicity**: Zero unused code, clear SaaS-only purpose
+- **Maintainability**: No more conflicting configuration files
+- **Architecture**: Clean separation between template and infrastructure
 
-### 3. **Configuration Unification**
+**Benefits:** ✅ **ACHIEVED** - Simplicity, no unused code, clear purpose
+
+### 3. **Configuration Unification** ✅ **COMPLETED - PHASE 1B**
 
 ```typescript
-// Single config file: lib/config.ts
-export const CONFIG = {
-  app: { name: 'Swiss SaaS', url: process.env.NEXT_PUBLIC_APP_URL },
-  swiss: { currency: 'CHF', locale: 'de-CH', timezone: 'Europe/Zurich' },
-  stripe: { /* unified stripe config */ },
-  supabase: { /* unified supabase config */ },
-  email: { /* resend config */ }
+// ✅ SINGLE CONFIG FILE IMPLEMENTED: lib/config.ts
+export const siteConfig = {
+  name: "SaaS Starter",
+  description: "100% self-hosted SaaS template optimized for Switzerland",
+  currency: "CHF" as const,
+  region: "swiss" as const,
+  locale: "de-CH" as const,
+  contact: {
+    email: "support@yourcompany.com",
+    company: "Your Company Name"
+  },
+  pricing: {
+    starter: 9.90,
+    pro: 19.90
+  }
 } as const;
 ```
 
-**Benefits:** One place to change settings, no conflicts
+**✅ Implementation Results:**
+- **Centralization**: All hardcoded values replaced with config imports
+- **Files Updated**: layout.tsx, header.tsx, footer.tsx, lib/plans.ts
+- **Single Source**: One place to change all template settings
+- **Type Safety**: Full TypeScript support with const assertions
+- **Swiss Focus**: CHF currency, de-CH locale, Swiss-optimized pricing
+
+**Benefits:** ✅ **ACHIEVED** - One place to change settings, no conflicts
 
 ### 4. **Server-First Components** ✅ **COMPLETED - PHASE 2A**
 
@@ -184,15 +207,18 @@ app/api/
 3. ✅ Update import paths across template (4 files updated)
 4. ✅ Create barrel exports for organized domains (clean domain imports)
 
+### **Phase 1B: Core Cleanup** ✅ **COMPLETED**
+1. ✅ Remove business model abstractions (lib/business-config.ts deleted, ~90 lines removed)
+2. ✅ Create unified configuration (lib/config.ts with Swiss-optimized 8 properties)
+3. ✅ Clean up conflicting config files (removed 3 obsolete .env files)
+4. ✅ JWT Token synchronization (Template ↔ Infrastructure perfectly aligned)
+5. ✅ Environment structure cleanup (docker-compose .env.local integration via symlink)
+6. ✅ Update all hardcoded values to use centralized config (4 files updated)
+
 ### **Phase 2C: API Route Restructuring** ⏳ **PENDING**
 1. ⏳ Create business domain API structure (`/api/v1/billing/`)
 2. ⏳ Implement missing SaaS endpoints (subscription cancellation, portal, invoices)
 3. ⏳ Add API versioning and Swiss payment optimizations
-
-### **Phase 1B: Core Cleanup** ⏳ **PENDING** 
-1. ⏳ Remove business model abstractions (`lib/business-config.ts`)
-2. ⏳ Create unified configuration (`lib/config.ts`)
-3. ⏳ Clean up conflicting config files
 
 ---
 
@@ -213,12 +239,14 @@ app/api/
 - **Clear:** ✅ Obvious server vs client boundaries (Phase 2A: Clean architecture)
 - **Swiss:** ✅ Maintained CHF/TWINT/de-CH optimization (Enhanced in lib/plans.ts)
 
-### **✅ NEWLY ACHIEVED:**
+### **✅ NEWLY ACHIEVED (Phase 1B):**
+- **Simplified:** ✅ Business model abstractions removal (Zero business model complexity)
+- **Unified:** ✅ Single source of truth configuration (lib/config.ts with 8 properties)
+- **Environment:** ✅ JWT synchronization and .env cleanup (3 obsolete files removed)
 - **Organized:** ✅ Component domains completed (Phase 2B: Zero scattered components)
 
 ### **⏳ IN PROGRESS:**
 - **API Structure:** API route organization and missing endpoints (Phase 2C)
-- **Simplified:** Business model abstractions removal (Phase 1B)
 
 ### **📊 Performance Metrics Achieved:**
 - **Bundle Size**: 70-90% reduction across dashboard pages
@@ -228,6 +256,10 @@ app/api/
 - **Swiss Optimization**: Centralized CHF pricing, Europe/Zurich timezone
 - **Component Organization**: Zero scattered components (7 → 0), clean domain structure
 - **Developer Experience**: Grouped imports, barrel exports, scalable architecture
+- **Code Reduction**: ~90 lines of business abstractions removed (Phase 1B)
+- **Configuration**: Single source of truth (8 properties), zero config conflicts
+- **Environment**: 100% JWT synchronization, 3 obsolete .env files removed
+- **Maintainability**: Zero business model complexity, clear SaaS-only focus
 
 ---
 

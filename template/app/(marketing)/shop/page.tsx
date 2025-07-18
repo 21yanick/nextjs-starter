@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { formatCurrency } from '@/lib/business-config'
+import { formatSwissPrice } from '@/lib/plans'
 import { ShoppingCart, Star } from 'lucide-react'
 
 export default function ShopPage() {
@@ -126,11 +126,11 @@ export default function ShopPage() {
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
                   <span className="text-2xl font-bold">
-                    {formatCurrency(product.price)}
+                    {formatSwissPrice(product.price / 100)}
                   </span>
                   {product.originalPrice && (
                     <span className="text-lg text-muted-foreground line-through">
-                      {formatCurrency(product.originalPrice)}
+                      {formatSwissPrice(product.originalPrice / 100)}
                     </span>
                   )}
                 </div>

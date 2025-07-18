@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme";
 import { Header, Footer } from "@/components/layout";
+import { getSiteMetadata } from "@/lib/config";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -14,9 +15,13 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const siteMetadata = getSiteMetadata();
+
 export const metadata: Metadata = {
-  title: "SaaS Starter - Self-Hosted Next.js 15 Kit",
-  description: "100% self-hosted SaaS starter kit with Next.js 15, Supabase, and Stripe. Production-ready from day 1.",
+  title: siteMetadata.title,
+  description: siteMetadata.description,
+  keywords: siteMetadata.keywords,
+  authors: [{ name: siteMetadata.author }],
 };
 
 export default function RootLayout({

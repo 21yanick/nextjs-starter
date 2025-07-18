@@ -1,4 +1,4 @@
-import { stripe, SUBSCRIPTION_PRICES, getBusinessConfig, getPaymentMethodsForCheckout } from './config';
+import { stripe, SUBSCRIPTION_PRICES, SWISS_SAAS_CONFIG, getSwissPaymentMethods } from './config';
 import { getUser } from '@/lib/supabase/server';
 import Stripe from 'stripe';
 
@@ -20,13 +20,13 @@ export async function createSubscriptionCheckout({
   const user = await getUser();
   if (!user?.email) throw new Error('User not authenticated');
 
-  const config = getBusinessConfig();
-  const paymentMethods = getPaymentMethodsForCheckout('saas');
+  const config = SWISS_SAAS_CONFIG;
+  const paymentMethods = getSwissPaymentMethods();
 
   const sessionParams: Stripe.Checkout.SessionCreateParams = {
     customer_email: user.email,
     mode: 'subscription',
-    payment_method_types: paymentMethods as Stripe.Checkout.SessionCreateParams.PaymentMethodType[],
+    payment_method_types: [...paymentMethods] as Stripe.Checkout.SessionCreateParams.PaymentMethodType[],
     line_items: [
       {
         price: SUBSCRIPTION_PRICES[priceId],

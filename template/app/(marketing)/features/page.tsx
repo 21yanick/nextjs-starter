@@ -1,6 +1,5 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { getBusinessConfig, getAvailableFeatures } from '@/lib/business-config'
 import { 
   Shield, 
   Zap, 
@@ -17,8 +16,6 @@ import {
 } from 'lucide-react'
 
 export default function FeaturesPage() {
-  const config = getBusinessConfig()
-  const availableFeatures = getAvailableFeatures()
 
   const coreFeatures = [
     {
@@ -174,113 +171,40 @@ export default function FeaturesPage() {
         </div>
       </section>
 
-      {/* SaaS Features */}
-      {availableFeatures.hasSubscriptions && (
-        <section className="mb-20">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4">
-              SaaS Platform Features
-              <Badge className="ml-3">SaaS</Badge>
-            </h2>
-            <p className="text-lg text-muted-foreground">
-              Everything you need to run a successful software business
-            </p>
-          </div>
-          
-          <div className="grid md:grid-cols-3 gap-8">
-            {saasFeatures.map((feature, index) => (
-              <Card key={index} className="h-full">
-                <CardHeader>
-                  <feature.icon className="w-12 h-12 text-primary mb-4" />
-                  <CardTitle className="text-xl">{feature.title}</CardTitle>
-                  <CardDescription>{feature.description}</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <ul className="space-y-2">
-                    {feature.features.map((item, itemIndex) => (
-                      <li key={itemIndex} className="text-sm text-muted-foreground">
-                        • {item}
-                      </li>
-                    ))}
-                  </ul>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </section>
-      )}
+      {/* SaaS Platform Features */}
+      <section className="mb-20">
+        <div className="text-center mb-12">
+          <h2 className="text-3xl font-bold mb-4">
+            SaaS Platform Features
+            <Badge className="ml-3">SaaS</Badge>
+          </h2>
+          <p className="text-lg text-muted-foreground">
+            Everything you need to run a successful software business
+          </p>
+        </div>
+        
+        <div className="grid md:grid-cols-3 gap-8">
+          {saasFeatures.map((feature, index) => (
+            <Card key={index} className="h-full">
+              <CardHeader>
+                <feature.icon className="w-12 h-12 text-primary mb-4" />
+                <CardTitle className="text-xl">{feature.title}</CardTitle>
+                <CardDescription>{feature.description}</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ul className="space-y-2">
+                  {feature.features.map((item, itemIndex) => (
+                    <li key={itemIndex} className="text-sm text-muted-foreground">
+                      • {item}
+                    </li>
+                  ))}
+                </ul>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </section>
 
-      {/* E-Commerce Features */}
-      {availableFeatures.hasShop && (
-        <section className="mb-20">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4">
-              E-Commerce Features
-              <Badge className="ml-3">Shop</Badge>
-            </h2>
-            <p className="text-lg text-muted-foreground">
-              Complete online store solution with modern commerce features
-            </p>
-          </div>
-          
-          <div className="grid md:grid-cols-3 gap-8">
-            {shopFeatures.map((feature, index) => (
-              <Card key={index} className="h-full">
-                <CardHeader>
-                  <feature.icon className="w-12 h-12 text-primary mb-4" />
-                  <CardTitle className="text-xl">{feature.title}</CardTitle>
-                  <CardDescription>{feature.description}</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <ul className="space-y-2">
-                    {feature.features.map((item, itemIndex) => (
-                      <li key={itemIndex} className="text-sm text-muted-foreground">
-                        • {item}
-                      </li>
-                    ))}
-                  </ul>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </section>
-      )}
-
-      {/* Booking Features */}
-      {availableFeatures.hasBookings && (
-        <section className="mb-20">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4">
-              Booking System Features
-              <Badge className="ml-3">Booking</Badge>
-            </h2>
-            <p className="text-lg text-muted-foreground">
-              Professional appointment management for service-based businesses
-            </p>
-          </div>
-          
-          <div className="grid md:grid-cols-3 gap-8">
-            {bookingFeatures.map((feature, index) => (
-              <Card key={index} className="h-full">
-                <CardHeader>
-                  <feature.icon className="w-12 h-12 text-primary mb-4" />
-                  <CardTitle className="text-xl">{feature.title}</CardTitle>
-                  <CardDescription>{feature.description}</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <ul className="space-y-2">
-                    {feature.features.map((item, itemIndex) => (
-                      <li key={itemIndex} className="text-sm text-muted-foreground">
-                        • {item}
-                      </li>
-                    ))}
-                  </ul>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </section>
-      )}
 
       {/* Additional Features */}
       <section>

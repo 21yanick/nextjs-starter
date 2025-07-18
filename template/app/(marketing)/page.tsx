@@ -1,12 +1,9 @@
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { getBusinessConfig, getAvailableFeatures } from '@/lib/business-config'
 import { ArrowRight, Check, Shield, Zap, Users } from 'lucide-react'
 import Link from 'next/link'
 
 export default function LandingPage() {
-  const config = getBusinessConfig()
-  const features = getAvailableFeatures()
 
   const getHeroContent = () => {
     return {
@@ -38,11 +35,9 @@ export default function LandingPage() {
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
-              {features.hasSubscriptions && (
-                <Button variant="outline" size="lg" asChild>
-                  <Link href="/pricing">View Pricing</Link>
-                </Button>
-              )}
+              <Button variant="outline" size="lg" asChild>
+                <Link href="/pricing">View Pricing</Link>
+              </Button>
             </div>
           </div>
         </div>
@@ -94,104 +89,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Business Model Specific Features */}
-      {features.isMultiModel && (
-        <section className="py-20">
-          <div className="container mx-auto px-4">
-            <div className="text-center mb-16">
-              <h2 className="text-3xl lg:text-4xl font-bold mb-4">
-                Flexible Business Models
-              </h2>
-              <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-                One platform, multiple possibilities. Choose what works for your business.
-              </p>
-            </div>
-
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {features.hasSubscriptions && (
-                <Card>
-                  <CardHeader>
-                    <CardTitle>SaaS Platform</CardTitle>
-                    <CardDescription>
-                      Subscription-based software with user management, billing, and analytics.
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <ul className="space-y-2">
-                      <li className="flex items-center">
-                        <Check className="w-4 h-4 mr-2 text-green-500" />
-                        User subscriptions
-                      </li>
-                      <li className="flex items-center">
-                        <Check className="w-4 h-4 mr-2 text-green-500" />
-                        Recurring billing
-                      </li>
-                      <li className="flex items-center">
-                        <Check className="w-4 h-4 mr-2 text-green-500" />
-                        Feature gating
-                      </li>
-                    </ul>
-                  </CardContent>
-                </Card>
-              )}
-
-              {features.hasShop && (
-                <Card>
-                  <CardHeader>
-                    <CardTitle>E-Commerce</CardTitle>
-                    <CardDescription>
-                      Online store with product catalog, cart, and payment processing.
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <ul className="space-y-2">
-                      <li className="flex items-center">
-                        <Check className="w-4 h-4 mr-2 text-green-500" />
-                        Product management
-                      </li>
-                      <li className="flex items-center">
-                        <Check className="w-4 h-4 mr-2 text-green-500" />
-                        Shopping cart
-                      </li>
-                      <li className="flex items-center">
-                        <Check className="w-4 h-4 mr-2 text-green-500" />
-                        Order tracking
-                      </li>
-                    </ul>
-                  </CardContent>
-                </Card>
-              )}
-
-              {features.hasBookings && (
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Appointment Booking</CardTitle>
-                    <CardDescription>
-                      Professional scheduling system with calendar integration and payments.
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <ul className="space-y-2">
-                      <li className="flex items-center">
-                        <Check className="w-4 h-4 mr-2 text-green-500" />
-                        Calendar management
-                      </li>
-                      <li className="flex items-center">
-                        <Check className="w-4 h-4 mr-2 text-green-500" />
-                        Time slot booking
-                      </li>
-                      <li className="flex items-center">
-                        <Check className="w-4 h-4 mr-2 text-green-500" />
-                        Deposit payments
-                      </li>
-                    </ul>
-                  </CardContent>
-                </Card>
-              )}
-            </div>
-          </div>
-        </section>
-      )}
 
       {/* CTA Section */}
       <section className="py-20 bg-primary text-primary-foreground">

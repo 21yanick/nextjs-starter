@@ -1,43 +1,16 @@
 import Link from "next/link"
 import { Container } from "@/components/layout/container"
 import { Separator } from "@/components/ui/separator"
-import { getBusinessConfig, getAvailableFeatures } from "@/lib/business-config"
+import { siteConfig } from "@/lib/config"
 
 export function Footer() {
-  const config = getBusinessConfig()
-  const features = getAvailableFeatures()
-
-  // SaaS-specific branding
-  const getBrandName = () => {
-    return 'SaaS Starter'
-  }
-
-  const getDescription = () => {
-    return '100% Self-hosted SaaS platform with Next.js 15 and Supabase.'
-  }
-
-  // Only include existing, functional links
-  const getProductLinks = () => {
-    const links = [
-      { href: '/features', label: 'Features' }
-    ]
-    
-    if (features.hasShop) {
-      links.push({ href: '/shop', label: 'Products' })
-    }
-    
-    if (features.hasSubscriptions) {
-      links.push({ href: '/pricing', label: 'Pricing' })
-    }
-    
-    if (features.hasBookings) {
-      links.push({ href: '/booking', label: 'Services' })
-    }
-    
-    return links
-  }
-
-  const productLinks = getProductLinks()
+  // Clean SaaS-only footer - using centralized config
+  const { name: brandName, description } = siteConfig
+  
+  const productLinks = [
+    { href: '/features', label: 'Features' },
+    { href: '/pricing', label: 'Pricing' }
+  ]
 
   return (
     <footer className="border-t bg-background">
@@ -53,10 +26,10 @@ export function Footer() {
                     S
                   </span>
                 </div>
-                <span className="font-bold">{getBrandName()}</span>
+                <span className="font-bold">{brandName}</span>
               </div>
               <p className="text-sm text-muted-foreground">
-                {getDescription()}
+                {description}
               </p>
             </div>
 
@@ -97,11 +70,11 @@ export function Footer() {
           {/* Bottom footer */}
           <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
             <p className="text-sm text-muted-foreground">
-              © 2025 {getBrandName()}. Built with Next.js 15 & Supabase.
+              © 2025 {brandName}. Built with Next.js 15 & Supabase.
             </p>
             <div className="flex items-center space-x-4">
               <span className="text-xs text-muted-foreground">
-                {config.model.toUpperCase()} Mode
+                SAAS Mode
               </span>
             </div>
           </div>

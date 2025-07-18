@@ -4,59 +4,14 @@ import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { AuthButton } from "@/components/auth"
 import { ThemeToggle } from "@/components/theme"
-import { getBusinessConfig, getAvailableFeatures } from "@/lib/business-config"
-
+import { siteConfig } from "@/lib/config"
 export function Header() {
-  const config = getBusinessConfig()
-  const features = getAvailableFeatures()
-
-  // SaaS-specific branding
-  const getBrandName = () => {
-    return 'SaaS Starter'
-  }
-
-  // Dynamic navigation based on business model and features
-  const getNavigationLinks = () => {
-    const links = []
-
-    // Always show Features
-    links.push({
-      href: '/features',
-      label: 'Features'
-    })
-
-    // Business model specific links
-    if (features.hasShop) {
-      links.push({
-        href: '/shop',
-        label: 'Shop'
-      })
-    }
-
-    if (features.hasSubscriptions) {
-      links.push({
-        href: '/pricing',
-        label: 'Pricing'
-      })
-    }
-
-    if (features.hasBookings) {
-      links.push({
-        href: '/booking',
-        label: 'Services'
-      })
-    }
-
-    // Contact for SaaS
-    links.push({
-      href: '/contact',
-      label: 'Contact'
-    })
-
-    return links
-  }
-
-  const navigationLinks = getNavigationLinks()
+  // Clean SaaS-only navigation - no conditionals needed
+  const navigationLinks = [
+    { href: '/features', label: 'Features' },
+    { href: '/pricing', label: 'Pricing' },
+    { href: '/contact', label: 'Contact' }
+  ]
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -71,7 +26,7 @@ export function Header() {
                 </span>
               </div>
               <span className="hidden font-bold sm:inline-block">
-                {getBrandName()}
+                {siteConfig.name}
               </span>
             </Link>
             <Badge variant="secondary" className="hidden sm:inline-flex">

@@ -5,8 +5,7 @@ export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   typescript: true,
 });
 
-// Business Model Types
-export type BusinessModel = 'saas' | 'shop' | 'booking' | 'universal';
+// SaaS-only Payment Types  
 export type PaymentMode = 'subscription' | 'payment' | 'setup';
 
 // Swiss-only Payment Methods Configuration
@@ -21,25 +20,15 @@ export const SUBSCRIPTION_PRICES = {
   enterprise: process.env.STRIPE_ENTERPRISE_PRICE_ID,
 } as const;
 
-// Business Model Configuration (Swiss-only)
-export function getBusinessConfig() {
-  const businessModel = (process.env.BUSINESS_MODEL as BusinessModel) || 'saas';
-  
-  return {
-    businessModel,
-    region: 'swiss',
-    paymentMethods: PAYMENT_METHODS.swiss,
-    currency: 'CHF',
-    enableSubscriptions: process.env.ENABLE_SUBSCRIPTIONS === 'true',
-    enableShop: process.env.ENABLE_SHOP === 'true',
-    enableBookings: process.env.ENABLE_BOOKINGS === 'true',
-  };
-}
+// Swiss SaaS Configuration (no conditionals needed)
+export const SWISS_SAAS_CONFIG = {
+  region: 'swiss',
+  paymentMethods: PAYMENT_METHODS.swiss,
+  currency: 'CHF',
+  subscriptions: true, // Always enabled for SaaS
+} as const;
 
-// Utility to get available payment methods for checkout
-export function getPaymentMethodsForCheckout(businessModel?: BusinessModel) {
-  const config = getBusinessConfig();
-  
-  // Swiss-only payment methods - all available for SaaS model
-  return config.paymentMethods;
+// Get Swiss payment methods for SaaS checkout
+export function getSwissPaymentMethods() {
+  return SWISS_SAAS_CONFIG.paymentMethods;
 }

@@ -1,69 +1,14 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { getBusinessConfig, formatCurrency } from '@/lib/business-config'
+import { getPlansWithPriceIds, formatSwissPrice } from '@/lib/plans'
 import { CheckoutButton } from '@/components/billing'
 import { Check } from 'lucide-react'
-import { env } from '@/lib/env'
 import Link from 'next/link'
 
 export default function PricingPage() {
-  const config = getBusinessConfig()
-
-  // Swiss SaaS Subscription Plans - CHF Optimized
-  const subscriptionPlans = [
-    {
-      id: 'free',
-      name: 'Free',
-      price: 0, // CHF 0.00
-      interval: 'month',
-      description: 'Für erste Schritte und Testen',
-      priceId: null, // No Stripe price needed for free
-      features: [
-        'Bis zu 1 Benutzer',
-        'Basis Features',
-        'Community Support',
-        'Bis zu 100 Einträge',
-        'Basic Dashboard',
-      ],
-      popular: false,
-    },
-    {
-      id: 'starter',
-      name: 'Starter',
-      price: 990, // CHF 9.90 in Rappen
-      interval: 'month',
-      description: 'Perfekt für kleine Teams und Startups',
-      priceId: env.STRIPE_STARTER_PRICE_ID,
-      features: [
-        'Bis zu 5 Benutzer',
-        'Alle Basis Features',
-        'E-Mail Support',
-        'Bis zu 1000 Einträge',
-        'Erweiterte Analytics',
-        'Mobile App Zugang',
-      ],
-      popular: true,
-    },
-    {
-      id: 'pro',
-      name: 'Pro',
-      price: 1990, // CHF 19.90 in Rappen
-      interval: 'month',
-      description: 'Für wachsende Unternehmen',
-      priceId: env.STRIPE_PRO_PRICE_ID,
-      features: [
-        'Bis zu 25 Benutzer',
-        'Alle Starter Features',
-        'Priority Support',
-        'Unbegrenzte Einträge',
-        'Erweiterte Integrationen',
-        'API Zugang',
-        'Custom Branding',
-      ],
-      popular: false,
-    },
-  ]
+  // Get centralized plans with environment-specific price IDs
+  const subscriptionPlans = getPlansWithPriceIds()
 
   return (
     <div className="container mx-auto px-4 py-20">
@@ -98,7 +43,7 @@ export default function PricingPage() {
                 <CardDescription>{plan.description}</CardDescription>
                 <div className="mt-4">
                   <span className="text-4xl font-bold">
-                    {formatCurrency(plan.price, config.currency)}
+                    {formatSwissPrice(plan.price)}
                   </span>
                   <span className="text-muted-foreground">/{plan.interval}</span>
                 </div>
