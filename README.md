@@ -21,7 +21,8 @@ pnpm install && pnpm run dev
 
 **Frontend:** Next.js 15 • React 19 • TypeScript • Tailwind CSS  
 **Backend:** Supabase (self-hosted) • PostgreSQL • Docker  
-**Payments:** Stripe Integration  
+**Payments:** Stripe Integration • CHF + TWINT  
+**Email:** Resend Integration (German Templates)  
 **Components:** Radix UI • shadcn/ui
 
 ## ✨ Features
@@ -49,6 +50,12 @@ pnpm install && pnpm run dev
 - Supabase Authentication und API
 - Docker Compose Development Stack
 - Database Management Interface
+
+### Professional Email System
+- Resend Integration für transactional Emails
+- Deutsche Email Templates (Welcome, Billing)
+- Swiss Formatierung (CHF, de-CH Datum)
+- Production-ready Domain Setup
 
 ## 📁 Projekt-Struktur
 
@@ -114,6 +121,7 @@ docker compose ps         # Service Status
 
 - **[Schnellstart](docs/01-quickstart.md)** - Komplette Setup Anleitung
 - **[Development](docs/05-development.md)** - Development Workflow
+- **[Service Integration](docs/04-integrations.md)** - Stripe, Supabase, Resend Setup
 - **[Infrastructure](infrastructure/README.md)** - Docker Setup Details
 
 ## 🔑 Environment Setup
@@ -130,6 +138,10 @@ NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_...
 STRIPE_SECRET_KEY=sk_test_...
 STRIPE_STARTER_PRICE_ID=price_...
 STRIPE_PRO_PRICE_ID=price_...
+
+# Email Service
+RESEND_API_KEY=re_your_api_key
+EMAIL_DOMAIN=yourdomain.ch
 
 # Application
 NEXT_PUBLIC_APP_URL=http://localhost:3000
