@@ -5,12 +5,15 @@ import { Separator } from "@/components/ui/separator"
 import { AuthButton } from "@/components/auth"
 import { ThemeToggle } from "@/components/theme"
 import { siteConfig } from "@/lib/config"
+// 🟩 SHOP-ONLY: Cart Icon Integration
+import { CartIcon } from "@/components/shop"
 export function Header() {
-  // Clean SaaS-only navigation - no conditionals needed
+  // ✅ SHARED navigation structure
+  // 🟩 SHOP-FOCUSED: Using /shop navigation (for SaaS: change back to /pricing)
   const navigationLinks = [
-    { href: '/features', label: 'Features' },
-    { href: '/pricing', label: 'Pricing' },
-    { href: '/contact', label: 'Contact' }
+    { href: '/features', label: 'Features' },        // ✅ SHARED
+    { href: '/shop', label: 'Shop' },                // 🟩 SHOP-ONLY: for SaaS use { href: '/pricing', label: 'Pricing' }
+    { href: '/contact', label: 'Contact' }           // ✅ SHARED
   ]
 
   return (
@@ -46,7 +49,10 @@ export function Header() {
               </Link>
             ))}
             <Separator orientation="vertical" className="h-6" />
+            {/* 🟩 SHOP-ONLY: Shopping Cart Icon */}
+            <CartIcon />
             <ThemeToggle />
+            {/* 🟦 SAAS-ONLY: AuthButton (for shop: make optional or replace with cart) */}
             <AuthButton />
           </nav>
         </div>

@@ -39,7 +39,8 @@
     "resend": "^4.6.0",
     "stripe": "^18.3.0",
     "tailwind-merge": "^3.3.1",
-    "zod": "^4.0.0"
+    "zod": "^4.0.0",
+    "zustand": "^5.0.6"
   },
   "devDependencies": {
     "@commitlint/cli": "^19.8.1",
@@ -59,19 +60,5 @@
     "tailwindcss-animate": "^1.0.7",
     "tw-animate-css": "^1.3.5",
     "typescript": "^5"
-  },
-  "businessModel": {
-    "type": "saas",
-    "features": {
-      "subscriptions": true,
-      "shop": false,
-      "bookings": false
-    },
-    "payments": {
-      "stripe": {
-        "products": "subscriptions",
-        "webhooks": ["customer.subscription.created", "customer.subscription.updated", "invoice.payment_succeeded"]
-      }
-    }
   }
 }

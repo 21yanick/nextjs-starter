@@ -1,25 +1,26 @@
 /**
  * Site Configuration - Single Source of Truth
- * Swiss SaaS Template - Essential configurations for customer projects
+ * ✅ SHARED: Core config used by all business models
+ * 🟦 SAAS-ONLY: Pricing section (remove for shop conversion)
  */
 
 export const siteConfig = {
-  // Core Brand Identity - Updated in 100% of customer projects
+  // ✅ SHARED: Core Brand Identity - Updated in 100% of customer projects
   name: "SaaS Starter",
   description: "100% self-hosted SaaS starter kit with Next.js 15, Supabase, and Stripe. Production-ready from day 1.",
   
-  // Business Essentials - Different for each market
+  // ✅ SHARED: Business Essentials - Different for each market
   currency: "CHF" as const,
   region: "swiss" as const,
   locale: "de-CH" as const,
   
-  // Contact & Legal - Required by Swiss/EU law
+  // ✅ SHARED: Contact & Legal - Required by Swiss/EU law
   contact: {
     email: "support@yourcompany.com",
     company: "Your Company Name"
   },
   
-  // Core Business Pricing - Market-specific adjustments
+  // 🟦 SAAS-ONLY: Subscription Pricing (remove for shop conversion)
   pricing: {
     starter: 9.90,
     pro: 19.90

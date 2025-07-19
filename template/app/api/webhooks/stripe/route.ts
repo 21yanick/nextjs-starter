@@ -171,6 +171,70 @@ export async function POST(request: NextRequest) {
         break
       }
 
+      case 'checkout.session.completed': {
+        // 🟩 SHOP-ONLY: Handle successful checkout (KISS implementation)
+        const session = event.data.object as Stripe.Checkout.Session
+        logger.info({ sessionId: session.id }, 'Checkout session completed')
+
+        if (session.mode === 'payment' && session.payment_status === 'paid') {
+          try {
+            // Retrieve session with line items
+            const fullSession = await stripe.checkout.sessions.retrieve(session.id, {
+              expand: ['line_items.data.price.product'],
+            })
+
+            // Calculate total amount in Rappen (CHF cents)
+            const totalAmount = fullSession.amount_total || 0
+
+            // Create order record
+            const { data: order, error: orderError } = await supabase
+              .from('orders')
+              .insert({
+                user_id: null, // Guest checkout - no user required
+                total_amount: totalAmount,
+                currency: 'CHF',
+                status: 'paid',
+                stripe_session_id: session.id,
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString(),
+              })
+              .select('id')
+              .single()
+
+            if (orderError) {
+              logger.error({ error: orderError, sessionId: session.id }, 'Failed to create order')
+              throw orderError
+            }
+
+            // Create order items from line items
+            if (fullSession.line_items?.data && order) {
+              const orderItems = fullSession.line_items.data.map((item, index) => ({
+                order_id: order.id,
+                product_id: `product-${index + 1}`, // Simple mapping for our demo products
+                quantity: item.quantity || 1,
+                unit_price: item.price?.unit_amount || 0,
+                total_price: (item.price?.unit_amount || 0) * (item.quantity || 1),
+              }))
+
+              const { error: itemsError } = await supabase
+                .from('order_items')
+                .insert(orderItems)
+
+              if (itemsError) {
+                logger.error({ error: itemsError, orderId: order.id }, 'Failed to create order items')
+                // Don't throw here - order is already created
+              }
+            }
+
+            logger.info({ orderId: order.id, sessionId: session.id }, 'Order created successfully')
+          } catch (error) {
+            logger.error({ error, sessionId: session.id }, 'Failed to process checkout session')
+            // Don't throw - this would return 500 to Stripe and cause retries
+          }
+        }
+        break
+      }
+
       default:
         logger.info({ eventType: event.type }, 'Unhandled webhook event')
     }
