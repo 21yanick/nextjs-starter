@@ -1,630 +1,361 @@
-# 🎨 Template-Anpassungen
+# 🎨 Starter Kit Customization Guide
 
-**Praktische Anleitungen zur Individualisierung des Starter Kits**
+**Transform your NextJS starter kit: SaaS ↔ Shop ↔ Custom in minutes**
 
-Das Template kann einfach für verschiedene Anwendungen angepasst werden - von SaaS zu Shop, Booking oder komplett eigenen Lösungen.
-
----
-
-## 🎯 Anpassungs-Philosophie
-
-**Modulare Anpassung statt komplexe Konfiguration:**
-- ✅ **Einfacher Umbau**: Pages und Components nach Bedarf ersetzen
-- ✅ **SQL Module**: Schema-Komponenten nach Anwendung aktivieren
-- ✅ **Saubere Struktur**: Keine komplexen Feature Flags
-- ✅ **Swiss-Optimiert**: CHF, de-CH, TWINT bleiben erhalten
-- ✅ **Type-Safe**: TypeScript Unterstützung bleibt vollständig
-
-### Standard → Angepasst
-
-Das Template kommt standardmäßig als **SaaS** und kann systematisch umgebaut werden:
-
-- **SaaS Standard**: Subscriptions, Pricing, Billing
-- **Shop Umbau**: Products, Orders, Shopping Cart  
-- **Booking Umbau**: Appointments, Services, Calendar
-- **Custom**: Eigene Business Logic
+This guide shows you how to convert between business models using our production-ready, dual-mode starter kit.
 
 ---
 
-## 🛍️ SaaS → Shop Umbau
+## 🚀 Quick Start: 3-Step Conversion
 
-### Schritt-für-Schritt Anleitung
-
-**1. SQL Schema aktivieren**
+### SaaS → Shop (3 minutes)
 
 ```bash
-# 1. Schema-Datei bearbeiten
-cd infrastructure/volumes/db/
-vi business-schema.sql
+# 1. Remove SaaS-specific code
+rm -rf app/\(marketing\)/pricing/
+rm -rf app/dashboard/subscription/
+rm -rf components/billing/
+rm lib/plans.ts
+
+# 2. Update navigation (1 line change)
+# In components/layout/header.tsx, change:
+# { href: '/pricing', label: 'Pricing' }    # to:
+# { href: '/shop', label: 'Shop' }
+
+# 3. Done! Shop is already functional
+npm run dev
+# → Open /shop to see your working e-commerce store
 ```
 
-```sql
--- business-schema.sql
-\i 00-core-schema.sql
-
--- SaaS deaktivieren
--- \i 01-saas-schema.sql
-
--- Shop aktivieren  
-\i 02-shop-schema.sql
-
--- Optional: Booking für Services
--- \i 03-booking-schema.sql
-```
+### Shop → SaaS (reverse process)
 
 ```bash
-# 2. Database neustarten
-cd ../../
-docker compose restart supabase-db
+# 1. Restore SaaS components (git checkout or copy from backups)
+git checkout HEAD -- app/\(marketing\)/pricing/
+git checkout HEAD -- app/dashboard/subscription/
+git checkout HEAD -- components/billing/
+git checkout HEAD -- lib/plans.ts
 
-# 3. Schema in Studio überprüfen
-open http://localhost:55323
-# → Tables Tab: products, orders, order_items sollten sichtbar sein
+# 2. Update navigation back to pricing
+# 3. Done! SaaS is ready
 ```
 
-**2. Navigation umstellen**
+**Why so simple?** Our starter kit runs **both systems simultaneously** with clean separation. No database migration needed!
+
+---
+
+## 🏗️ Architecture: Dual-Mode Design
+
+### Self-Explanatory Structure
 
 ```typescript
-// components/layout/header.tsx
-export function Header() {
-  const navigationLinks = [
-    { href: '/shop', label: 'Shop' },         // ← /pricing ersetzen
-    { href: '/features', label: 'Produkte' }, // ← /features anpassen
-    { href: '/contact', label: 'Kontakt' }    // ← bleibt gleich
-  ]
+template/
+├── app/
+│   ├── (marketing)/
+│   │   ├── pricing/           // 🟦 SAAS-ONLY
+│   │   └── shop/              // 🟩 SHOP-ONLY
+│   ├── dashboard/
+│   │   ├── subscription/      // 🟦 SAAS-ONLY  
+│   │   └── orders/            // 🟩 SHOP-ONLY
+│   └── api/
+│       └── webhooks/stripe/   // ✅ SHARED (handles both)
+├── components/
+│   ├── billing/               // 🟦 SAAS-ONLY
+│   ├── shop/                  // 🟩 SHOP-ONLY
+│   └── ui/                    // ✅ SHARED
+└── lib/
+    ├── plans.ts               // 🟦 SAAS-ONLY
+    ├── shop/                  // 🟩 SHOP-ONLY
+    ├── email/templates/       // ✅ SHARED (both models)
+    └── config.ts              // ✅ SHARED
+```
+
+### Key Principles
+
+- **✅ No Feature Flags**: Separate files for each business model
+- **✅ Self-Explanatory**: Comments show SHARED vs BUSINESS-SPECIFIC
+- **✅ Copy-Paste Ready**: All examples work out of the box
+- **✅ Swiss-Optimized**: CHF, TWINT, de-CH throughout
+- **✅ Modern Stack**: NextJS 15, Server Actions, TypeScript, Zustand
+
+---
+
+## 🛍️ Shop System Reference
+
+### Complete E-Commerce Flow
+
+Our shop implementation is **production-ready** with:
+
+```yaml
+✅ Cart System: Zustand + persist, real-time updates
+✅ Checkout: Server Actions, CHF + TWINT, guest checkout  
+✅ Order Management: Dashboard, status updates, Swiss formatting
+✅ Email System: Order confirmation + status updates
+✅ Payment Processing: Stripe hosted, webhook-driven persistence
+✅ Address Collection: Smart digital/physical product detection
+```
+
+### 1. Product Catalog
+
+```typescript
+// lib/shop/products.ts - Real implementation
+export const products: Product[] = [
+  {
+    id: 'premium-tshirt',
+    name: 'Premium T-Shirt',
+    description: 'Hochwertiges T-Shirt aus Bio-Baumwolle',
+    price: 2490, // 24.90 CHF in Rappen
+    currency: 'CHF',
+    digital: false, // Physical product = shipping required
+    stripe_price_id: 'price_1RmVHYEFwSnkmysmWsfWDbWe',
+    image_url: '/images/products/t-shirt-premium.svg'
+  },
+  {
+    id: 'digital-guide',
+    name: 'Digital Style Guide',
+    description: 'PDF-Leitfaden für modernes Design',
+    price: 1990, // 19.90 CHF
+    currency: 'CHF', 
+    digital: true, // Digital product = no shipping
+    stripe_price_id: 'price_1RmVLsEFwSnkmysmQS17NN4y',
+    image_url: '/images/products/guide-digital.svg'
+  }
+]
+```
+
+### 2. Shopping Cart (Zustand + Persist)
+
+```typescript
+// lib/shop/cart-store.ts - Production-ready state management
+import { create } from 'zustand'
+import { persist } from 'zustand/middleware'
+
+interface CartState {
+  items: CartItem[]
+  isOpen: boolean
+  addItem: (product: Product) => void
+  removeItem: (productId: string) => void
+  updateQuantity: (productId: string, quantity: number) => void
+  clearCart: () => void
+  toggleCart: () => void
+  // Computed functions (not getters to avoid infinite loops)
+  getItemCount: () => number
+  getTotal: () => number
+}
+
+export const useCartStore = create<CartState>()(
+  persist(
+    (set, get) => ({
+      items: [],
+      isOpen: false,
+      
+      addItem: (product) => set((state) => {
+        const existingItem = state.items.find(item => item.product.id === product.id)
+        if (existingItem) {
+          return {
+            items: state.items.map(item =>
+              item.product.id === product.id
+                ? { ...item, quantity: item.quantity + 1 }
+                : item
+            )
+          }
+        }
+        return { items: [...state.items, { product, quantity: 1 }] }
+      }),
+      
+      // ... other methods
+      
+      getItemCount: () => get().items.reduce((total, item) => total + item.quantity, 0),
+      getTotal: () => get().items.reduce((total, item) => total + (item.product.price * item.quantity), 0)
+    }),
+    { name: 'shopping-cart' }
+  )
+)
+```
+
+### 3. Checkout (Server Actions)
+
+```typescript
+// lib/shop/checkout-actions.ts - Modern NextJS 15 pattern
+'use server'
+
+import { stripe } from '@/lib/stripe/config'
+import { headers } from 'next/headers'
+import { redirect } from 'next/navigation'
+
+export async function createCheckoutSession(cartItems: CartItem[]) {
+  // Detect if shipping is needed (KISS approach)
+  const needsShipping = cartItems.some(item => !item.product.digital)
   
-  // Rest bleibt gleich...
+  const session = await stripe.checkout.sessions.create({
+    mode: 'payment', // One-time payment (not subscription)
+    payment_method_types: ['card', 'twint'],
+    currency: 'chf',
+    
+    line_items: cartItems.map(item => ({
+      price: item.product.stripe_price_id,
+      quantity: item.quantity,
+    })),
+    
+    // Conditional shipping collection
+    ...(needsShipping && {
+      shipping_address_collection: { allowed_countries: ['CH'] },
+    }),
+    
+    success_url: `${process.env.NEXT_PUBLIC_APP_URL}/shop/success`,
+    cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/shop`,
+  })
+  
+  redirect(session.url!)
 }
 ```
 
-**3. Dashboard umbauen**
-
-```bash
-# Subscription Dashboard entfernen
-rm -rf template/app/dashboard/subscription/
-
-# Shop Dashboard erstellen
-mkdir template/app/dashboard/orders/
-```
+### 4. Order Management Dashboard
 
 ```typescript
-// template/app/dashboard/orders/page.tsx
-import { getUser } from '@/lib/auth/server'
-import { createClient } from '@/lib/supabase/server'
-import { OrdersTable } from '@/components/shop/orders-table'
+// app/dashboard/orders/page.tsx - Server Component
+import { createServerClient } from '@supabase/ssr'
+import { cookies } from 'next/headers'
 
 export default async function OrdersPage() {
-  const user = await getUser()
-  if (!user) return null
+  const supabase = createServerClient(/* config */)
   
-  const supabase = createClient()
   const { data: orders } = await supabase
     .from('orders')
     .select(`
       *,
       order_items (
-        *,
-        product:products (name, price)
+        id, product_name, quantity, unit_price, total_price
       )
     `)
-    .eq('customer_id', user.id)
     .order('created_at', { ascending: false })
   
   return (
-    <div className="container mx-auto py-8">
-      <h1 className="text-3xl font-bold mb-8">Meine Bestellungen</h1>
-      <OrdersTable orders={orders} />
+    <div className="space-y-6">
+      <h1 className="text-3xl font-bold">Bestellungen</h1>
+      
+      <div className="grid gap-4">
+        {orders?.map((order) => (
+          <OrderCard key={order.id} order={order} />
+        ))}
+      </div>
     </div>
   )
 }
 ```
 
-**4. Shop Components erstellen**
-
-```bash
-# Shop Components Verzeichnis
-mkdir template/components/shop/
-```
+### 5. Email System (Swiss-Optimized)
 
 ```typescript
-// components/shop/product-card.tsx
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { formatSwissPrice } from '@/lib/plans'
+// lib/email/templates/order-confirmation.tsx
+export function OrderConfirmationEmail({
+  customerEmail,
+  orderId,
+  orderItems,
+  totalAmount,
+  hasShipping,
+  shippingAddress
+}: OrderConfirmationEmailProps) {
+  const formattedTotal = new Intl.NumberFormat('de-CH', {
+    style: 'currency',
+    currency: 'CHF',
+  }).format(totalAmount / 100)
 
-interface ProductCardProps {
-  product: {
-    id: string
-    name: string
-    description: string
-    price: number // in Rappen
-    image_url?: string
-  }
-  onAddToCart: (productId: string) => void
-}
-
-export function ProductCard({ product, onAddToCart }: ProductCardProps) {
   return (
-    <Card className="h-full">
-      {product.image_url && (
-        <div className="aspect-square overflow-hidden">
-          <img 
-            src={product.image_url} 
-            alt={product.name}
-            className="w-full h-full object-cover"
-          />
-        </div>
-      )}
-      <CardHeader>
-        <CardTitle>{product.name}</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <p className="text-sm text-muted-foreground mb-4">
-          {product.description}
-        </p>
-        <div className="flex items-center justify-between">
-          <span className="text-2xl font-bold">
-            {formatSwissPrice(product.price / 100)}
-          </span>
-          <Button onClick={() => onAddToCart(product.id)}>
-            In den Warenkorb
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
+    <Html>
+      <Head />
+      <Preview>Bestellbestätigung - {formattedTotal}</Preview>
+      <Body>
+        <Container>
+          <Heading>Bestellung erfolgreich!</Heading>
+          <Text>
+            Vielen Dank für Ihre Bestellung #{orderId.slice(-8)}.
+          </Text>
+          
+          {/* Order items, shipping, etc. */}
+          
+        </Container>
+      </Body>
+    </Html>
   )
 }
 ```
 
-**5. Shop API Routes**
+**Email Integration (Webhook):**
 
 ```typescript
-// app/api/cart/add/route.ts
-import { NextRequest, NextResponse } from 'next/server'
-import { getUser } from '@/lib/auth/server'
-import { createClient } from '@/lib/supabase/server'
-
-export async function POST(request: NextRequest) {
-  try {
-    const user = await getUser()
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-    
-    const { productId, quantity = 1 } = await request.json()
-    
-    const supabase = createClient()
-    
-    // Add to cart logic (session-based or database)
-    // Implementation depends on your cart strategy
-    
-    return NextResponse.json({ success: true })
-  } catch (error) {
-    return NextResponse.json(
-      { error: 'Failed to add to cart' }, 
-      { status: 500 }
-    )
-  }
-}
-```
-
-**6. Stripe für Shop anpassen**
-
-```typescript
-// lib/stripe/shop.ts
-import { stripe } from './config'
-
-export async function createShopCheckout(items: {
-  productId: string
-  quantity: number
-  price: number
-}[]) {
-  const session = await stripe.checkout.sessions.create({
-    mode: 'payment', // ← nicht subscription!
-    payment_method_types: ['card', 'twint'],
-    line_items: items.map(item => ({
-      price_data: {
-        currency: 'chf',
-        product_data: {
-          name: `Product ${item.productId}`,
-        },
-        unit_amount: item.price, // in Rappen
-      },
-      quantity: item.quantity,
-    })),
-    success_url: `${process.env.NEXT_PUBLIC_APP_URL}/shop/success`,
-    cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/shop`,
-  })
+// app/api/webhooks/stripe/route.ts - KISS email sending
+case 'checkout.session.completed': {
+  // ... create order in database
   
-  return session
+  // Send confirmation email
+  if (session.customer_details?.email) {
+    await resend.emails.send({
+      from: `Shop <noreply@${process.env.EMAIL_DOMAIN}>`,
+      to: session.customer_details.email,
+      subject: `Bestellbestätigung #${order.id.slice(-8)}`,
+      react: OrderConfirmationEmail({ /* props */ }),
+    })
+  }
+  break
 }
 ```
 
 ---
 
-## 📅 SaaS → Booking Umbau
+## 💼 SaaS System Reference
 
-### Service-Buchung System
-
-**1. Booking Schema aktivieren**
-
-```sql
--- business-schema.sql
-\i 00-core-schema.sql
--- \i 01-saas-schema.sql    -- deaktivieren
-\i 03-booking-schema.sql   -- aktivieren
-```
-
-**2. Booking Components**
+### Subscription Management
 
 ```typescript
-// components/booking/service-selector.tsx
-export function ServiceSelector({ 
-  services, 
-  onSelect 
-}: {
-  services: Service[]
-  onSelect: (service: Service) => void
-}) {
+// components/billing/plan-comparison.tsx
+export function PlanComparison() {
+  const plans = [
+    {
+      name: 'Starter',
+      price: 2990, // 29.90 CHF
+      features: ['5 Projekte', 'Email Support'],
+      stripe_price_id: 'price_starter_monthly'
+    },
+    {
+      name: 'Pro',
+      price: 7990, // 79.90 CHF  
+      features: ['Unbegrenzte Projekte', 'Priority Support'],
+      stripe_price_id: 'price_pro_monthly'
+    }
+  ]
+  
   return (
-    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-      {services.map((service) => (
-        <Card key={service.id} className="cursor-pointer hover:shadow-lg">
-          <CardHeader>
-            <CardTitle>{service.name}</CardTitle>
-            <div className="text-2xl font-bold">
-              {formatSwissPrice(service.price / 100)}
-              <span className="text-sm text-muted-foreground">
-                / {service.duration}min
-              </span>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground mb-4">
-              {service.description}
-            </p>
-            <Button onClick={() => onSelect(service)} className="w-full">
-              Service wählen
-            </Button>
-          </CardContent>
-        </Card>
+    <div className="grid md:grid-cols-2 gap-6">
+      {plans.map((plan) => (
+        <PlanCard key={plan.name} plan={plan} />
       ))}
     </div>
   )
 }
 ```
 
-**3. Calendar Integration**
+### Subscription Checkout
 
 ```typescript
-// components/booking/time-slot-picker.tsx
-import { useState } from 'react'
-import { Calendar } from '@/components/ui/calendar'
-import { Button } from '@/components/ui/button'
-
-export function TimeSlotPicker({ 
-  serviceId, 
-  onSlotSelect 
-}: {
-  serviceId: string
-  onSlotSelect: (slot: Date) => void
-}) {
-  const [selectedDate, setSelectedDate] = useState<Date>()
-  const [availableSlots, setAvailableSlots] = useState<Date[]>([])
-  
-  // Fetch available slots when date changes
-  useEffect(() => {
-    if (selectedDate) {
-      fetchAvailableSlots(serviceId, selectedDate)
-        .then(setAvailableSlots)
-    }
-  }, [selectedDate, serviceId])
-  
-  return (
-    <div className="grid md:grid-cols-2 gap-8">
-      <div>
-        <h3 className="text-lg font-semibold mb-4">Datum wählen</h3>
-        <Calendar
-          selected={selectedDate}
-          onSelect={setSelectedDate}
-          disabled={(date) => date < new Date()}
-        />
-      </div>
-      
-      <div>
-        <h3 className="text-lg font-semibold mb-4">Zeit wählen</h3>
-        <div className="grid grid-cols-2 gap-2">
-          {availableSlots.map((slot) => (
-            <Button
-              key={slot.toISOString()}
-              variant="outline"
-              onClick={() => onSlotSelect(slot)}
-            >
-              {slot.toLocaleTimeString('de-CH', {
-                hour: '2-digit',
-                minute: '2-digit'
-              })}
-            </Button>
-          ))}
-        </div>
-      </div>
-    </div>
-  )
-}
-```
-
----
-
-## 🎨 Branding & Design
-
-### Logo und Visual Identity
-
-**1. Logo ersetzen**
-
-```bash
-# Logo-Dateien ersetzen (SVG empfohlen)
-template/public/logo.svg          # Header Logo
-template/public/favicon.ico       # Browser Favicon  
-template/public/apple-icon.png    # Mobile Icon
-```
-
-**2. Brand Colors anpassen**
-
-```typescript
-// tailwind.config.ts
-export default {
-  theme: {
-    extend: {
-      colors: {
-        primary: {
-          50: '#f0f9ff',
-          100: '#e0f2fe', 
-          500: '#0ea5e9',  // ← Ihre Hauptfarbe
-          600: '#0284c7',
-          900: '#0c4a6e',
-        },
-        // Weitere Brand Colors...
-      }
-    }
-  }
-}
-```
-
-**3. Typography anpassen**
-
-```typescript
-// tailwind.config.ts
-export default {
-  theme: {
-    extend: {
-      fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
-        heading: ['Poppins', 'Inter', 'sans-serif'], // ← Custom Font
-      }
-    }
-  }
-}
-```
-
-### Zentrale Konfiguration
-
-**Branding in lib/config.ts:**
-
-```typescript
-export const siteConfig = {
-  // Branding - wird in jedem Projekt angepasst
-  name: "Ihr Unternehmen",
-  description: "Ihre professionelle Lösung für...",
-  
-  // Regional Settings (Swiss bleibt)
-  currency: "CHF" as const,
-  region: "swiss" as const, 
-  locale: "de-CH" as const,
-  
-  // Business Settings - an Ihr Modell anpassen
-  pricing: {
-    starter: 29.90,     // ← Ihre Preise
-    pro: 79.90,
-    enterprise: 199.90  // ← falls benötigt
-  },
-  
-  // Kontakt-Informationen
-  contact: {
-    email: "info@ihrunternehmen.ch",
-    company: "Ihr Unternehmen GmbH",
-    phone: "+41 44 123 45 67",       // ← neu
-    address: "Ihre Adresse, Zürich"  // ← neu
-  },
-  
-  // Social Media (optional)
-  social: {
-    twitter: "https://twitter.com/ihrunternehmen",
-    linkedin: "https://linkedin.com/company/ihrunternehmen"
-  }
-} as const
-```
-
----
-
-## 🔧 Custom Features
-
-### Neue Funktionalität hinzufügen
-
-**1. Database Schema erweitern**
-
-```sql
--- infrastructure/volumes/db/04-custom-schema.sql
--- Custom tables für Ihre spezifischen Anforderungen
-
-CREATE TABLE IF NOT EXISTS public.your_custom_table (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE,
-  custom_field TEXT NOT NULL,
-  metadata JSONB DEFAULT '{}',
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW()
-);
-
--- RLS aktivieren
-ALTER TABLE public.your_custom_table ENABLE ROW LEVEL SECURITY;
-
--- Policy für User-spezifische Daten
-CREATE POLICY "Users can manage own data" 
-  ON public.your_custom_table 
-  FOR ALL USING (auth.uid() = user_id);
-```
-
-```sql
--- business-schema.sql erweitern
-\i 00-core-schema.sql
-\i 01-saas-schema.sql  -- oder andere Module
-\i 04-custom-schema.sql  -- ← Ihr Custom Schema
-```
-
-**2. TypeScript Types generieren**
-
-```bash
-# Supabase Types aktualisieren
-pnpm supabase gen types typescript --local > types/database.ts
-```
-
-**3. Custom API Routes**
-
-```typescript
-// app/api/custom-feature/route.ts
-import { NextRequest, NextResponse } from 'next/server'
-import { getUser } from '@/lib/auth/server'
-import { createClient } from '@/lib/supabase/server'
-
-export async function GET(request: NextRequest) {
-  const user = await getUser()
-  if (!user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
-  
-  const supabase = createClient()
-  const { data, error } = await supabase
-    .from('your_custom_table')
-    .select('*')
-    .eq('user_id', user.id)
-  
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 })
-  }
-  
-  return NextResponse.json({ data })
-}
-
-export async function POST(request: NextRequest) {
-  const user = await getUser()
-  if (!user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
-  
-  const body = await request.json()
-  
-  const supabase = createClient()
-  const { data, error } = await supabase
-    .from('your_custom_table')
-    .insert({
-      user_id: user.id,
-      custom_field: body.customField,
-      metadata: body.metadata || {}
+// components/billing/checkout-button.tsx
+export function CheckoutButton({ priceId }: { priceId: string }) {
+  const handleCheckout = async () => {
+    const session = await stripe.checkout.sessions.create({
+      mode: 'subscription', // Recurring payment
+      payment_method_types: ['card', 'twint'],
+      line_items: [{ price: priceId, quantity: 1 }],
+      success_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard`,
+      cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/pricing`,
     })
-    .select()
-    .single()
     
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 })
-  }
-  
-  return NextResponse.json({ data })
-}
-```
-
-**4. Custom Components**
-
-```typescript
-// components/custom/your-feature.tsx
-import { useState, useEffect } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-
-interface CustomData {
-  id: string
-  customField: string
-  createdAt: string
-}
-
-export function YourFeature() {
-  const [data, setData] = useState<CustomData[]>([])
-  const [inputValue, setInputValue] = useState('')
-  const [loading, setLoading] = useState(false)
-  
-  // Daten laden
-  useEffect(() => {
-    fetchCustomData()
-  }, [])
-  
-  const fetchCustomData = async () => {
-    const response = await fetch('/api/custom-feature')
-    const result = await response.json()
-    setData(result.data || [])
-  }
-  
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setLoading(true)
-    
-    try {
-      const response = await fetch('/api/custom-feature', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ customField: inputValue })
-      })
-      
-      if (response.ok) {
-        setInputValue('')
-        fetchCustomData() // Daten neu laden
-      }
-    } catch (error) {
-      console.error('Error:', error)
-    } finally {
-      setLoading(false)
-    }
+    window.location.href = session.url!
   }
   
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Ihre Custom Funktion</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <Input
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            placeholder="Eingabe..."
-            required
-          />
-          <Button type="submit" disabled={loading}>
-            {loading ? 'Speichern...' : 'Hinzufügen'}
-          </Button>
-        </form>
-        
-        <div className="mt-6 space-y-2">
-          {data.map((item) => (
-            <div key={item.id} className="p-3 border rounded">
-              <p>{item.customField}</p>
-              <span className="text-xs text-muted-foreground">
-                {new Date(item.createdAt).toLocaleDateString('de-CH')}
-              </span>
-            </div>
-          ))}
-        </div>
-      </CardContent>
-    </Card>
+    <Button onClick={handleCheckout}>
+      Jetzt abonnieren
+    </Button>
   )
 }
 ```
@@ -633,156 +364,318 @@ export function YourFeature() {
 
 ## 🌐 Production Setup
 
-### Domain und SSL
+### 1. Environment Configuration
 
-**1. Custom Domain konfigurieren**
-
-```env
-# Production .env.local
+```bash
+# .env.local - Production setup
 NEXT_PUBLIC_APP_URL=https://yourdomain.ch
 EMAIL_DOMAIN=yourdomain.ch
-```
 
-**2. SSL Certificate**
-
-```bash
-# Bei den meisten Hosting-Providern automatisch
-# Vercel: Automatisches SSL
-# Netlify: Automatisches SSL
-# Eigener Server: Let's Encrypt verwenden
-```
-
-**3. DNS Konfiguration**
-
-```dns
-# DNS Records für yourdomain.ch
-A     @     123.45.67.89        # Main domain
-CNAME www   yourdomain.ch       # www redirect
-MX    @     10 mail.provider.com # Email (falls eigener Server)
-
-# Email DNS (für Resend)
-TXT   @     "v=spf1 include:_spf.resend.com ~all"
-CNAME resend._domainkey.yourdomain.ch resend._domainkey.resend.com
-```
-
-### Environment Migration
-
-**Development → Production:**
-
-```bash
-# 1. API Keys aktualisieren
-STRIPE_SECRET_KEY=sk_live_...           # ← Live Keys!
+# Stripe (use live keys in production)
+STRIPE_SECRET_KEY=sk_live_...
 NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_live_...
-RESEND_API_KEY=re_live_...
+STRIPE_WEBHOOK_SECRET=whsec_...
 
-# 2. Database Migration
-# Supabase Cloud oder eigene PostgreSQL
+# Resend (for emails)
+RESEND_API_KEY=re_...
+
+# Supabase
 NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
-DATABASE_URL=postgresql://user:pass@host:5432/db
-
-# 3. Monitoring
-NEXT_PUBLIC_SENTRY_DSN=https://production-dsn...
+SUPABASE_SERVICE_ROLE_KEY=eyJ...
 ```
 
----
+### 2. Email Setup (Resend)
 
-## 🔄 Maintenance & Updates
-
-### Template Updates
-
-Das Template kann aktualisiert werden ohne bestehende Anpassungen zu verlieren:
-
-**1. Backup erstellen**
-
-```bash
-# Git Branch für Backup
-git checkout -b backup-customizations-$(date +%Y%m%d)
-git commit -am "Backup before template update"
+**Domain Configuration:**
+```dns
+# Add these DNS records to yourdomain.ch
+TXT   @     "v=spf1 include:_spf.resend.com ~all"
+CNAME resend._domainkey  resend._domainkey.resend.com
 ```
 
-**2. Selective Updates**
+**Test Email Sending:**
+```typescript
+// Test in development
+import { resend } from '@/lib/email/client'
+import { OrderConfirmationEmail } from '@/lib/email/templates'
 
-```bash
-# Nur spezifische Template-Dateien aktualisieren
-# Beispiel: Neue UI Components
-cp template/components/ui/new-component.tsx your-project/components/ui/
-
-# Core System Updates (vorsichtig!)
-# lib/auth/, lib/supabase/ nur bei Breaking Changes
+await resend.emails.send({
+  from: 'Shop <shop@yourdomain.ch>',
+  to: 'test@example.com',
+  subject: 'Test Email',
+  react: OrderConfirmationEmail({
+    customerEmail: 'test@example.com',
+    orderId: 'test-order-123',
+    orderItems: [],
+    totalAmount: 2490,
+    orderDate: new Date().toISOString(),
+    hasShipping: false,
+  }),
+})
 ```
 
-**3. Database Migrations**
+### 3. Database Setup
+
+**Our starter kit includes both schemas by default:**
 
 ```sql
--- Neue Schema-Features hinzufügen ohne bestehende zu brechen
--- Beispiel: Neue Felder zu bestehenden Tabellen
-ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS new_field TEXT;
+-- infrastructure/volumes/db/02-shop-schema.sql
+CREATE TABLE IF NOT EXISTS public.products (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  name TEXT NOT NULL,
+  description TEXT,
+  price INTEGER NOT NULL, -- in Rappen (CHF cents)
+  currency TEXT DEFAULT 'CHF',
+  digital BOOLEAN DEFAULT false,
+  stripe_price_id TEXT UNIQUE,
+  image_url TEXT,
+  active BOOLEAN DEFAULT true,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS public.orders (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  customer_id UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
+  email TEXT NOT NULL,
+  status TEXT DEFAULT 'pending',
+  total_amount INTEGER NOT NULL,
+  currency TEXT DEFAULT 'CHF',
+  shipping_address JSONB,
+  stripe_checkout_session_id TEXT UNIQUE,
+  stripe_payment_intent_id TEXT UNIQUE,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- ... order_items table and RLS policies
 ```
 
-### Backup Strategy
+**No migration needed!** Both SaaS and Shop schemas coexist.
 
-**Database Backup:**
+### 4. Stripe Configuration
 
+**Products Setup (one-time):**
 ```bash
-# Regelmäßige Database Backups
-pg_dump $DATABASE_URL > backup-$(date +%Y%m%d).sql
+# Create products in Stripe Dashboard or via CLI
+stripe products create --name "Premium T-Shirt" --description "Bio-Baumwolle"
+stripe prices create --product prod_xxx --currency chf --unit-amount 2490
 
-# Automatisiert via Cron (Production)
-0 2 * * * pg_dump $DATABASE_URL | gzip > /backups/db-$(date +%Y%m%d).sql.gz
+# For SaaS subscriptions
+stripe prices create --product prod_yyy --currency chf --unit-amount 2990 --recurring-interval month
 ```
 
-**Code Versioning:**
-
+**Webhook Setup:**
 ```bash
-# Release Tags für Stable Versions
-git tag v1.0.0
-git push origin --tags
-
-# Feature Branches für große Änderungen
-git checkout -b feature/new-payment-provider
+# Add webhook endpoint in Stripe Dashboard:
+# URL: https://yourdomain.ch/api/webhooks/stripe
+# Events: checkout.session.completed, customer.subscription.created, customer.subscription.updated
 ```
 
 ---
 
-## 📋 Anpassungs-Checklist
+## 🎨 Branding & Customization
 
-### Basis-Anpassungen
-- [ ] Logo und Favicon aktualisiert
-- [ ] Brand Colors in tailwind.config.ts
-- [ ] Site Config angepasst (Name, Kontakt)
-- [ ] Navigation für Anwendung optimiert
+### 1. Visual Identity
 
-### Schema & Funktionen
-- [ ] SQL Schema aktiviert (SaaS/Shop/Booking)
-- [ ] Database Services neugestartet
-- [ ] TypeScript Types aktualisiert
-- [ ] Custom API Routes erstellt
+```typescript
+// lib/config.ts - Central configuration
+export const siteConfig = {
+  name: "Ihr Unternehmen",
+  description: "Professionelle Schweizer Lösung für...",
+  
+  // Regional Settings (Swiss optimized)
+  currency: "CHF" as const,
+  region: "swiss" as const,
+  locale: "de-CH" as const,
+  
+  // Contact Information
+  contact: {
+    email: "info@ihrunternehmen.ch",
+    company: "Ihr Unternehmen GmbH",
+    phone: "+41 44 123 45 67",
+    address: "Bahnhofstrasse 1, 8001 Zürich"
+  },
+  
+  // Social Media
+  social: {
+    twitter: "https://twitter.com/ihrunternehmen",
+    linkedin: "https://linkedin.com/company/ihrunternehmen"
+  }
+} as const
+```
 
-### Components & UI
-- [ ] Unnötige Components entfernt
-- [ ] Anwendungs-spezifische Components erstellt
-- [ ] Dashboard für Anwendung angepasst
-- [ ] Email Templates aktualisiert
+### 2. Theme Customization
 
-### Integration & Services
-- [ ] Stripe für Anwendung konfiguriert
-- [ ] Payment Flow getestet
-- [ ] Email Templates angepasst
-- [ ] Error Tracking konfiguriert
+```typescript
+// tailwind.config.ts - Brand colors
+export default {
+  theme: {
+    extend: {
+      colors: {
+        primary: {
+          50: '#f0f9ff',
+          500: '#0ea5e9',  // Your main brand color
+          600: '#0284c7',
+          900: '#0c4a6e',
+        }
+      },
+      fontFamily: {
+        sans: ['Inter', 'system-ui', 'sans-serif'],
+        heading: ['Poppins', 'Inter', 'sans-serif'],
+      }
+    }
+  }
+}
+```
 
-### Production Setup
-- [ ] Custom Domain konfiguriert
-- [ ] SSL Certificate aktiv
-- [ ] Production API Keys gesetzt
-- [ ] DNS Records konfiguriert
-- [ ] Backup Strategy implementiert
+### 3. Logo & Assets
 
-### Testing
-- [ ] Alle Features getestet
-- [ ] Payment Flow validiert
-- [ ] Email Delivery funktioniert
-- [ ] Mobile Responsiveness geprüft
-- [ ] Performance optimiert
+```bash
+# Replace logo files
+template/public/logo.svg          # Header logo
+template/public/favicon.ico       # Browser favicon
+template/public/apple-icon.png    # Mobile icon
+
+# Product images (optional upgrade from SVG placeholders)
+template/public/images/products/
+├── product-1.jpg                 # 400x400px, <50KB
+├── product-2.jpg
+└── ...
+```
+
+---
+
+## 🔧 Advanced Customization
+
+### Custom Business Logic
+
+**1. Add Custom Database Tables:**
+
+```sql
+-- infrastructure/volumes/db/04-custom-schema.sql
+CREATE TABLE IF NOT EXISTS public.custom_features (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE,
+  feature_data JSONB NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Enable RLS
+ALTER TABLE public.custom_features ENABLE ROW LEVEL SECURITY;
+
+-- User-specific policy
+CREATE POLICY "Users can manage own features" 
+  ON public.custom_features 
+  FOR ALL USING (auth.uid() = user_id);
+```
+
+**2. Custom API Routes:**
+
+```typescript
+// app/api/custom/route.ts
+import { NextRequest, NextResponse } from 'next/server'
+import { getUser } from '@/lib/auth/server'
+import { createClient } from '@/lib/supabase/server'
+
+export async function GET(request: NextRequest) {
+  const user = await getUser()
+  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  
+  const supabase = createClient()
+  const { data } = await supabase
+    .from('custom_features')
+    .select('*')
+    .eq('user_id', user.id)
+  
+  return NextResponse.json({ data })
+}
+```
+
+**3. Custom Components:**
+
+```typescript
+// components/custom/feature.tsx
+'use client'
+
+import { useState, useEffect } from 'react'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+
+export function CustomFeature() {
+  const [data, setData] = useState([])
+  
+  useEffect(() => {
+    fetch('/api/custom')
+      .then(res => res.json())
+      .then(result => setData(result.data || []))
+  }, [])
+  
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Custom Feature</CardTitle>
+      </CardHeader>
+      <CardContent>
+        {data.map((item) => (
+          <div key={item.id}>
+            {/* Your custom UI */}
+          </div>
+        ))}
+      </CardContent>
+    </Card>
+  )
+}
+```
+
+---
+
+## 📋 Conversion Checklist
+
+### SaaS → Shop Migration
+
+- [ ] **Remove SaaS Code**
+  - [ ] Delete `/pricing`, `/subscription`, `/billing` directories
+  - [ ] Remove `lib/plans.ts`
+  - [ ] Clean up unused imports
+
+- [ ] **Update Navigation**
+  - [ ] Change header navigation `/pricing` → `/shop`
+  - [ ] Update dashboard navigation
+  - [ ] Test all navigation links
+
+- [ ] **Configure Products**
+  - [ ] Add products to `lib/shop/products.ts`
+  - [ ] Set up Stripe price IDs in `.env.local`
+  - [ ] Add product images to `/public/images/products/`
+
+- [ ] **Test Shop Flow**
+  - [ ] Browse products at `/shop`
+  - [ ] Add items to cart
+  - [ ] Complete checkout process
+  - [ ] Verify order creation
+  - [ ] Test email notifications
+
+- [ ] **Production Setup**
+  - [ ] Configure email domain (Resend)
+  - [ ] Set up Stripe webhooks
+  - [ ] Test with live Stripe keys
+  - [ ] Verify SSL certificate
+
+### Shop → SaaS Migration
+
+- [ ] **Restore SaaS Code**
+  - [ ] Restore pricing, subscription, billing components
+  - [ ] Add back `lib/plans.ts`
+  - [ ] Update imports
+
+- [ ] **Update Navigation**
+  - [ ] Change header navigation `/shop` → `/pricing`
+  - [ ] Test subscription flow
+
+- [ ] **Test SaaS Flow**
+  - [ ] Browse plans at `/pricing`
+  - [ ] Complete subscription checkout
+  - [ ] Verify subscription creation
+  - [ ] Test billing dashboard
 
 ---
 
@@ -791,44 +684,95 @@ git checkout -b feature/new-payment-provider
 ### Code Organization
 
 ```bash
-# Projekt-spezifische Dateien separieren
+# Keep business-specific code separated
 components/
-├── ui/              # Template UI (wenig ändern)
-├── auth/            # Template Auth (wenig ändern)  
-├── custom/          # ← Ihre spezifischen Components
-└── [app-specific]/  # ← SaaS: billing/, Shop: shop/, etc.
+├── ui/              # ✅ SHARED - Use everywhere
+├── auth/            # ✅ SHARED - Universal auth
+├── shop/            # 🟩 SHOP-ONLY - Delete for SaaS
+├── billing/         # 🟦 SAAS-ONLY - Delete for Shop
+└── custom/          # 🎨 YOUR-SPECIFIC - Custom features
 
 lib/
-├── config.ts        # ← Hauptsächlich hier anpassen
-├── supabase/        # Template (wenig ändern)
-├── stripe/          # ← Anwendungs-spezifisch anpassen
-└── custom/          # ← Ihre Business Logic
+├── config.ts        # ✅ SHARED - Main configuration
+├── shop/            # 🟩 SHOP-ONLY
+├── plans.ts         # 🟦 SAAS-ONLY
+└── custom/          # 🎨 YOUR-SPECIFIC
 ```
 
-### Version Control
+### Version Control Strategy
 
 ```bash
-# Branch Strategy für Anpassungen
-main                    # Template Base (clean)
-feature/branding       # Branding Anpassungen
-feature/shop-system    # Shop-spezifische Features
-feature/custom-logic   # Ihre Business Logic
-production            # Deployed Version
+# Branch strategy for customizations
+main                    # Clean starter kit base
+feature/branding       # Visual identity changes
+feature/shop-system    # Shop-specific features  
+feature/custom-logic   # Your business logic
+production            # Deployed version
+
+# Keep customizations modular
+git checkout -b feature/your-custom-feature
+# Make changes in isolated components
+git commit -m "Add custom feature X"
 ```
 
-### Documentation
+### Performance Optimization
 
-```bash
-# Projekt-spezifische Dokumentation
-docs/
-├── setup.md          # ← Ihr Setup Guide
-├── features.md       # ← Ihre Features
-├── deployment.md     # ← Ihr Deployment
-└── customizations.md # ← Ihre Anpassungen
+```typescript
+// Lazy load business-specific components
+const ShopComponents = dynamic(() => import('@/components/shop'), {
+  loading: () => <div>Loading shop...</div>
+})
+
+const BillingComponents = dynamic(() => import('@/components/billing'), {
+  loading: () => <div>Loading billing...</div>
+})
+```
+
+### Monitoring & Analytics
+
+```typescript
+// lib/analytics.ts - Track business model usage
+export function trackConversion(model: 'saas' | 'shop', event: string) {
+  // Your analytics implementation
+  analytics.track(`${model}_${event}`, {
+    timestamp: new Date().toISOString(),
+    model,
+    event
+  })
+}
+
+// Usage in components
+trackConversion('shop', 'purchase_completed')
+trackConversion('saas', 'subscription_created')
 ```
 
 ---
 
-**Anpassungs-Status:** Template → Ihr Projekt ✅  
-**Flexibilität:** SaaS/Shop/Booking/Custom ✅  
-**Swiss-Optimiert:** CHF + TWINT + de-CH ✅
+## 🚀 Success Criteria
+
+### Technical Excellence
+- ✅ **Clean Separation**: No business model code mixing
+- ✅ **Type Safety**: Complete TypeScript coverage
+- ✅ **Performance**: <3s load time, optimized bundles
+- ✅ **Mobile Ready**: Responsive design, touch-friendly
+- ✅ **Accessibility**: WCAG 2.1 AA compliance
+
+### Swiss Standards
+- ✅ **Currency**: CHF formatting throughout
+- ✅ **Payments**: TWINT + major cards supported
+- ✅ **Language**: German content, de-CH locale
+- ✅ **Legal**: Swiss address format, postal codes
+- ✅ **UX**: Swiss user expectations met
+
+### Production Ready
+- ✅ **Security**: RLS policies, input validation
+- ✅ **Reliability**: Error handling, graceful degradation
+- ✅ **Scalability**: Database design, caching strategy
+- ✅ **Monitoring**: Logging, error tracking
+- ✅ **Documentation**: Complete setup guides
+
+---
+
+**🎉 Your starter kit is now ready for any business model!**
+
+Need help? Check our [GitHub issues](https://github.com/your-repo/issues) or reach out to our support team.

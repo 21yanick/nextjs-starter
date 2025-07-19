@@ -9,6 +9,8 @@ import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { requireAuth } from '@/lib/auth/server'
 import { revalidatePath } from 'next/cache'
+import { resend } from '@/lib/email/client'
+import { OrderStatusEmail } from '@/lib/email/templates'
 
 // Create Supabase client for server actions
 async function createClient() {
@@ -43,6 +45,13 @@ export async function updateOrderStatus(orderId: string, newStatus: string) {
 
     const supabase = await createClient()
     
+    // Get current order data for email
+    const { data: currentOrder } = await supabase
+      .from('orders')
+      .select('status, email, total_amount, created_at, shipping_address')
+      .eq('id', orderId)
+      .single()
+    
     const { error } = await supabase
       .from('orders')
       .update({ 
@@ -54,6 +63,33 @@ export async function updateOrderStatus(orderId: string, newStatus: string) {
     if (error) {
       console.error('Order status update error:', error)
       return { error: 'Fehler beim Aktualisieren des Status' }
+    }
+    
+    // 🟩 SHOP-ONLY: Send status update email (KISS implementation)
+    try {
+      if (currentOrder?.email && currentOrder.status !== newStatus) {
+        const hasShipping = currentOrder.shipping_address ? true : false
+        
+        await resend.emails.send({
+          from: `Shop <noreply@${process.env.EMAIL_DOMAIN || 'localhost'}>`,
+          to: currentOrder.email,
+          subject: `Bestellung #${orderId.slice(-8)} - Status aktualisiert`,
+          react: OrderStatusEmail({
+            customerEmail: currentOrder.email,
+            orderId: orderId,
+            oldStatus: currentOrder.status,
+            newStatus: newStatus,
+            totalAmount: currentOrder.total_amount,
+            orderDate: currentOrder.created_at,
+            hasShipping: hasShipping,
+          }),
+        })
+        
+        console.log(`Status update email sent for order ${orderId} to ${currentOrder.email}`)
+      }
+    } catch (emailError) {
+      console.error('Failed to send status update email:', emailError)
+      // Don't fail the status update if email fails
     }
     
     // Revalidate pages that show order data

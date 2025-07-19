@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { stripe } from '@/lib/stripe/config'
 import { createServerClient } from '@supabase/ssr'
 import { getLogger } from '@/lib/logger'
+import { resend } from '@/lib/email/client'
+import { OrderConfirmationEmail } from '@/lib/email/templates'
 import Stripe from 'stripe'
 
 const logger = getLogger('stripe-webhook')
@@ -191,10 +193,19 @@ export async function POST(request: NextRequest) {
               .from('orders')
               .insert({
                 user_id: null, // Guest checkout - no user required
+                email: session.customer_details?.email || null,
                 total_amount: totalAmount,
                 currency: 'CHF',
-                status: 'paid',
-                stripe_session_id: session.id,
+                status: 'pending', // Start with pending, will be updated to paid after confirmation
+                stripe_checkout_session_id: session.id,
+                stripe_payment_intent_id: session.payment_intent as string || null,
+                shipping_address: session.shipping_details?.address ? {
+                  name: session.shipping_details.name,
+                  line1: session.shipping_details.address.line1,
+                  city: session.shipping_details.address.city,
+                  postal_code: session.shipping_details.address.postal_code,
+                  country: session.shipping_details.address.country,
+                } : null,
                 created_at: new Date().toISOString(),
                 updated_at: new Date().toISOString(),
               })
@@ -210,7 +221,7 @@ export async function POST(request: NextRequest) {
             if (fullSession.line_items?.data && order) {
               const orderItems = fullSession.line_items.data.map((item, index) => ({
                 order_id: order.id,
-                product_id: `product-${index + 1}`, // Simple mapping for our demo products
+                product_name: (item.price?.product as Stripe.Product)?.name || `Product ${index + 1}`,
                 quantity: item.quantity || 1,
                 unit_price: item.price?.unit_amount || 0,
                 total_price: (item.price?.unit_amount || 0) * (item.quantity || 1),
@@ -227,6 +238,48 @@ export async function POST(request: NextRequest) {
             }
 
             logger.info({ orderId: order.id, sessionId: session.id }, 'Order created successfully')
+
+            // 🟩 SHOP-ONLY: Send order confirmation email (KISS implementation)
+            try {
+              if (session.customer_details?.email) {
+                // Prepare order items data for email
+                const emailOrderItems = fullSession.line_items.data.map((item) => ({
+                  product_name: (item.price?.product as Stripe.Product)?.name || 'Product',
+                  quantity: item.quantity || 1,
+                  unit_price: item.price?.unit_amount || 0,
+                  total_price: (item.price?.unit_amount || 0) * (item.quantity || 1),
+                }))
+
+                // Check if shipping is needed (simple detection)
+                const hasShipping = session.shipping_details?.address ? true : false
+
+                await resend.emails.send({
+                  from: `Shop <noreply@${process.env.EMAIL_DOMAIN || 'localhost'}>`,
+                  to: session.customer_details.email,
+                  subject: `Bestellbestätigung #${order.id.slice(-8)}`,
+                  react: OrderConfirmationEmail({
+                    customerEmail: session.customer_details.email,
+                    orderId: order.id,
+                    orderItems: emailOrderItems,
+                    totalAmount: totalAmount,
+                    orderDate: new Date().toISOString(),
+                    hasShipping: hasShipping,
+                    shippingAddress: session.shipping_details?.address ? {
+                      name: session.shipping_details.name || '',
+                      line1: session.shipping_details.address.line1 || '',
+                      city: session.shipping_details.address.city || '',
+                      postal_code: session.shipping_details.address.postal_code || '',
+                      country: session.shipping_details.address.country || '',
+                    } : undefined,
+                  }),
+                })
+
+                logger.info({ orderId: order.id, email: session.customer_details.email }, 'Order confirmation email sent')
+              }
+            } catch (emailError) {
+              logger.error({ error: emailError, orderId: order.id }, 'Failed to send order confirmation email')
+              // Don't throw - order is already created successfully
+            }
           } catch (error) {
             logger.error({ error, sessionId: session.id }, 'Failed to process checkout session')
             // Don't throw - this would return 500 to Stripe and cause retries
