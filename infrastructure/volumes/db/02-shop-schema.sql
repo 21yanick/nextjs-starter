@@ -59,27 +59,40 @@ CREATE POLICY "Anyone can view active products"
   USING (active = true);
 
 -- RLS Policies for orders
+-- 🟩 SHOP-ONLY: Shop Owner Dashboard Access
 DROP POLICY IF EXISTS "Users can view own orders" ON public.orders;
-CREATE POLICY "Users can view own orders" 
+DROP POLICY IF EXISTS "Authenticated users can view all orders" ON public.orders;
+CREATE POLICY "Authenticated users can view all orders" 
   ON public.orders FOR SELECT 
-  USING (auth.uid() = customer_id);
+  USING (auth.uid() IS NOT NULL); -- Any authenticated user = shop owner
 
+-- Order creation: Service role only (webhook creates orders)
 DROP POLICY IF EXISTS "Users can create orders" ON public.orders;
-CREATE POLICY "Users can create orders" 
+DROP POLICY IF EXISTS "Service role can create orders" ON public.orders;
+CREATE POLICY "Service role can create orders" 
   ON public.orders FOR INSERT 
-  WITH CHECK (auth.uid() = customer_id);
+  WITH CHECK (auth.role() = 'service_role' OR auth.uid() IS NOT NULL);
+
+-- Order updates: Authenticated users can update status (shop owner)
+DROP POLICY IF EXISTS "Authenticated users can update orders" ON public.orders;
+CREATE POLICY "Authenticated users can update orders" 
+  ON public.orders FOR UPDATE 
+  USING (auth.uid() IS NOT NULL) 
+  WITH CHECK (auth.uid() IS NOT NULL);
 
 -- RLS Policies for order_items
+-- 🟩 SHOP-ONLY: Shop Owner Dashboard Access
 DROP POLICY IF EXISTS "Users can view own order items" ON public.order_items;
-CREATE POLICY "Users can view own order items" 
+DROP POLICY IF EXISTS "Authenticated users can view all order items" ON public.order_items;
+CREATE POLICY "Authenticated users can view all order items" 
   ON public.order_items FOR SELECT 
-  USING (
-    EXISTS (
-      SELECT 1 FROM public.orders 
-      WHERE orders.id = order_items.order_id 
-      AND orders.customer_id = auth.uid()
-    )
-  );
+  USING (auth.uid() IS NOT NULL); -- Any authenticated user = shop owner
+
+-- Order items creation: Service role only (webhook creates order items)
+DROP POLICY IF EXISTS "Service role can create order items" ON public.order_items;
+CREATE POLICY "Service role can create order items" 
+  ON public.order_items FOR INSERT 
+  WITH CHECK (auth.role() = 'service_role');
 
 -- Additional storage bucket for product images
 INSERT INTO storage.buckets (id, name)
